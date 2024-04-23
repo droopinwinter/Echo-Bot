@@ -25,16 +25,16 @@ for i in Ticker.Stock:
     sql3 = 'select * FROM [Stock].[dbo].['+i.strip()+'_AnalysDay] '
     data = pd.read_sql(sql3, engine, parse_dates=True)
     data.columns = ["date","open","high","low","close","adjclose","colume",\
-    "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m","willrd","willrw","willrm",\
-    "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
-    "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
-    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]
+                    "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
+                    "willrd","willrw","willrm",\
+                    "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
+                    "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
+                    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]
     #data.set_index("date" , inplace=True)
     print('Ticker='+i)
     xapka = pd.DataFrame()
-    #for j in range(0,len(data)):
-    for j in range(1,10):
-        print(data.loc[j])
+    #for j in range(6,len(data)):
+    for j in range(600,1000):
         try:
             #print(data.at[j, 'ema1'])#print("Date" ,str(data.at[j,'date']))          
             #利用EMA和MACD判斷長週期上升趨勢做多或空
@@ -46,17 +46,24 @@ for i in Ticker.Stock:
                     xema =-1 #修正趨勢交易<超買時做空
             else:
                 xema = 0 #無法識別走勢<持倉或觀望不操作
-            #短線判斷進出場信號              
-            if xema>0: #上升趨勢找修正低點做多
-                if data.at[j, 'MACD_d'] > data.at[j, 'signal_d'] and data.at[j-1, 'MACD_d'] < data.at[j-1, 'signal_d'] :    
-                    xmacd =2
-                else:
-                    xmacd =0
+            #短線判斷進出場信號
+            if data.at[j, 'signal_d'] <0 and data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] :
+                xmacd =-1
+                if data.at[j-1, 'MACD_d'] > data.at[j-1, 'signal_d'] :
+                    xmacd =-2
+            elif data.at[j, 'signal_d'] >0 and data.at[j, 'MACD_d'] > data.at[j, 'signal_d']:
+                xmacd =1
+                if data.at[j-1, 'MACD_d'] < data.at[j-1, 'signal_d'] :
+                    xmacd =2            
+            else:
+                xmacd =0
 
-                if data.at[j, 'fastK_d'] < data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] < 20 :
+
+            if xema>0: #上升趨勢找修正低點做多
+                if data.at[j, 'fastk_d'] < 20 and data.at[j, 'fastd_d'] < 20 :
                     xsrsi = 1
-                    for k in range(j-5,j): 
-                        if  data.at[k, 'fastK_w'] < data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] < 20 :
+                    for k in range(j-10,j): 
+                        if  data.at[k, 'fastk_w'] < 20 and  data.at[k, 'fastd_w'] < 20 :
                             xsrsi = 2
                 else:
                     xsrsi = 0
@@ -69,20 +76,17 @@ for i in Ticker.Stock:
                 else:
                     xwillrd = 0
 
-                if data.at[j, 'low'] < data.at[j, 'low_d'] and data.at[j, 'close'] > data.at[j-1, 'low_d'] : 
+                if  data.at[j, 'low'] < data.at[j, 'mid_d']: 
+                    xBBand = 1
+                elif data.at[j, 'low'] < data.at[j, 'low_d'] and data.at[j, 'close'] > data.at[j-1, 'low_d']:
                     xBBand = 2
                 else:
                     xBBand = 0                                    
             elif xema<0: #下降趨勢找高點做空
-                if data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] and data.at[j-1, 'MACD_d'] > data.at[j-1, 'signal_d'] :    
-                    xmacd =-2
-                else:
-                    xmacd =0
-
-                if data.at[j, 'fastK_d'] > data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] > 80 :
+                if data.at[j, 'fastk_d'] > 80 and data.at[j, 'fastd_d'] > 80 :
                     xsrsi = -1
-                    for k in range(j-5,j): 
-                        if data.at[k, 'fastK_w'] > data.at[k, 'fastd_w'] and data.at[k, 'fastd_d'] > 80 :
+                    for k in range(j-10,j): 
+                        if data.at[k, 'fastk_w'] > 80 and data.at[k, 'fastd_d'] > 80 :
                             xsrsi = -2
                 else:
                     xsrsi = 0  
@@ -94,37 +98,41 @@ for i in Ticker.Stock:
                             xwillrd = -2
                 else:
                     xwillrd = 0
-                
-                if data.at[j, 'high'] > data.at[j, 'upp_d'] and data.at[j, 'close'] < data.at[j-1, 'upp_d'] :
+                if  data.at[j, 'high'] > data.at[j, 'mid_d']: 
+                    xBBand = -1
+                elif data.at[j, 'high'] > data.at[j, 'upp_d'] and data.at[j, 'close'] < data.at[j-1, 'upp_d'] :
                     xBBand = -2
                 else:
                     xBBand = 0
             else:
-                xmacd =0
                 xsrsi =0
                 xwillrd =0
                 if data.at[j, 'high'] > data.at[j, 'upp_d'] and data.at[j, 'close'] < data.at[j-1, 'upp_d'] :
                     xBBand = -1
                     for k in range(j-5,j): 
-                        if data.at[k, 'fastK_d'] > data.at[k, 'fastd_d'] and data.at[k, 'fastd_d'] > 80 :
+                            #data.at[j,"fastk_d"]
+                        if data.at[k, 'fastk_d'] > data.at[k, 'fastd_d'] and data.at[k, 'fastd_d'] > 80 :
                             xBBand = -2                
                 elif data.at[j, 'low'] < data.at[j, 'low_d'] and data.at[j, 'close'] > data.at[j-1, 'low_d'] : 
                     xBBand = 1
                     for k in range(j-5,j): 
-                        if data.at[k, 'fastK_d'] < data.at[k, 'fastd_d'] and data.at[k, 'fastd_d'] < 20 :
+                        if data.at[k, 'fastk_d'] < data.at[k, 'fastd_d'] and data.at[k, 'fastd_d'] < 20 :
                             xBBand = 2                 
                 else:
                     xBBand = 0            
             
-            xapka=pd.DataFrame([ data.at[j,'date'], xema, xmacd, xsrsi, xwillrd, xBBand])
+            a=[ data.at[j,'date'], xema, xmacd, xsrsi, xwillrd, xBBand, xema+ xmacd+ xsrsi+ xwillrd+ xBBand]
             #xapka = xapka.append(a,ignore_index=True)
             #print(xema, xmacd, xsrsi, xwillrd, xBBand)
-            print(xapka)
+            xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)    
 
+xapka.columns = ["date","xema", "xmacd", "xsrsi", "xwillrd", "xBBand","total"]
+#print(xapka)
+xapka.to_csv("ApkaSPY.CSV")
 '''
-[date],[Ticker],[strategy],[STOCHRSI],[MACD],[WILLR],[BBANDS],[EMA],[pattern],[total],[LongOrShort],[current],[support],[pressure],[profit],[loss],[PLratio],[remark]
+"date","Ticker","strategy","STOCHRSI","MACD","WILLR","BBANDS","EMA","pattern","total","LongOrShort","current","support","pressure","profit","loss","PLratio","remark"
 '''
 
         
