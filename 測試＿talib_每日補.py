@@ -33,7 +33,7 @@ try:
 
             sql3 = 'select top 1000 Date FROM [Stock].[dbo].[RowDay_'+i.strip()+'] order by date desc'
             SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select * FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000'"
+            sql3 = "select distinct [Date],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000'"
             data = pd.read_sql(sql3, engine, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
@@ -52,7 +52,7 @@ try:
             try:          
                 data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data1.reset_index(drop=True)
-                data.to_sql( i.strip()+'_AnalysDay',engine,if_exists='append', index=False)
+                data.to_sql( 'AnalysDay_'+i.strip(),engine,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', i.strip() , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
@@ -68,7 +68,7 @@ try:
 
             sql3 = 'select top 1000 Datetime Date FROM [Stock].[dbo].[RowHour_'+i.strip()+'] order by date desc'
             SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select * FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000'"
+            sql3 = "select distinct [Datetime],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000'"
             data = pd.read_sql(sql3, engine, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
@@ -87,7 +87,7 @@ try:
             try:          
                 data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data1.reset_index(drop=True)
-                data.to_sql( i.strip()+'_AnalysHour',engine,if_exists='append', index=False)
+                data.to_sql( 'AnalysHour_'+i.strip(),engine,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', i.strip() , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容

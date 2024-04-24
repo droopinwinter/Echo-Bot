@@ -26,7 +26,7 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 
 for i in Ticker.Stock:
     print(i)
-    sql3 = 'select * FROM [Stock].[dbo].[RowDay_'+i.strip()+'] '
+    sql3 = 'select distinct [Date],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowDay_'+i.strip()+'] '
     #data = pd.read_sql(sql3, engine, index_col="Date", parse_dates=True)
     data = pd.read_sql(sql3, engine, parse_dates=True)
     data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
@@ -55,7 +55,7 @@ for i in Ticker.Stock:
         
         data.reset_index(drop=True)
         #data.set_index('date')
-        data.to_sql( i.strip()+'_AnalysDay',engine,if_exists='append', index=False)
+        data.to_sql( 'AnalysDay_'+i.strip(),engine,if_exists='append', index=False)
         #data.drop("key_0", axis = 1)
         #del data['key_0']
         #data.to_csv("tech_idx.csv")
