@@ -5,15 +5,17 @@ import pandas as pd
 from pandas import DataFrame,Series
 from datetime import datetime
 from datetime import timedelta
+import matplotlib.pyplot as plt
+import numpy as np
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
     conn = pymssql.connect(host="192.9.12.226:1433", user='sa', password='abc123', database='Stock',charset='GBK')
     cursor = conn.cursor()    
     engine = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/Stock?charset=GBK")
-
-    sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
-    pd_TechAnalysis = pd.read_sql(sql, engine)
+    engine1 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/analsy?charset=GBK")
+    #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
+    #pd_TechAnalysis = pd.read_sql(sql, engine)
 
     sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
@@ -22,9 +24,12 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
     print('連線SQL發生錯誤-' , errMsg)
 
 for i in Ticker.Stock:
-    sql3 = 'select * FROM [Stock].[dbo].['+i.strip()+'_AnalysDay] '
-    data = pd.read_sql(sql3, engine, parse_dates=True)
-    data.columns = ["date","open","high","low","close","adjclose","colume",\
+    sql3 = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
+            [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
+            [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
+            FROM [Stock].[dbo].[AnalysDay_"+i.strip()+"] WHere date > '2019-02-03 00:00:00.000'"
+    data = pd.read_sql(sql3, engine1, parse_dates=True)
+    data.columns = ["date","open","high","low","close","colume",\
                     "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
                     "willrd","willrw","willrm",\
                     "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
@@ -121,16 +126,41 @@ for i in Ticker.Stock:
                 else:
                     xBBand = 0            
             
-            a=[ data.at[j,'date'], xema, xmacd, xsrsi, xwillrd, xBBand, xema+ xmacd+ xsrsi+ xwillrd+ xBBand]
+            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, xsrsi, xwillrd, xBBand, xema+ xmacd+ xsrsi+ xwillrd+ xBBand]
             #xapka = xapka.append(a,ignore_index=True)
             #print(xema, xmacd, xsrsi, xwillrd, xBBand)
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)    
 
-xapka.columns = ["date","xema", "xmacd", "xsrsi", "xwillrd", "xBBand","total"]
+xapka.columns = ["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","total"]
+#畫EMA趨勢線
+#plt.figure(num =3, figsize=(17,7)) 
+fig = plt.figure(num =1, figsize=(19,10))    #創建圖表
+sub1 = fig.add_subplot(2, 1, 1) # 添加子圖表1
+sub2 = fig.add_subplot(2, 1, 2) # 添加子圖表2
+sub1.plot(xapka["date"],xapka["close"],label="close" ,color = 'blue') 
+sub2.plot(xapka["date"],xapka["xema"],label="xema" , linewidth = 0.5, linestyle = '-' ,color = 'red') 
+sub2.plot(xapka["date"],xapka["xmacd"],label="xmacd" , linewidth = 0.5, linestyle = '--',color = 'green')  
+sub2.plot(xapka["date"],xapka["xsrsi"],label="xsrsi" , linewidth = 0.5, linestyle = '-.',color = 'brown') 
+sub2.plot(xapka["date"],xapka["xwillrd"],label="xwillrd" , linewidth = 0.5, linestyle = '--',color = 'black')  
+sub2.plot(xapka["date"],xapka["xBBand"],label="xBBand" , linewidth = 1, linestyle = '-.',color = 'indigo') 
+sub2.plot(xapka["date"],xapka["total"],label="total" , linewidth = 0.5, linestyle = ':',color = 'purple')
+for i in range(0,len(xapka)):
+    if xapka.at[i,"total"] >=3 :
+        sub1.text(xapka.at[i, "date"], xapka.at[i, "close"],'4',color='red')
+    elif xapka.at[i,"total"] <= -3 :
+        sub1.text(xapka.at[i, "date"],xapka.at[i, "close"],'-4',color='blue')
+
+## 設定x軸和y軸的範圍空間
+#plt.xlim((-1, 2.5))
+## 設定x軸與y軸標籤名稱
+#plt.xticks(xapka["date"])
+plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
+plt.legend() 
+plt.show()
 #print(xapka)
-xapka.to_csv("ApkaSPY.CSV")
+#xapka.to_csv("ApkaSPY.CSV")
 '''
 "date","Ticker","strategy","STOCHRSI","MACD","WILLR","BBANDS","EMA","pattern","total","LongOrShort","current","support","pressure","profit","loss","PLratio","remark"
 '''
