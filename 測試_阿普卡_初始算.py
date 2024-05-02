@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from datetime import datetime
 import pandas as pd
 from pandas import DataFrame,Series
-from datetime import datetime
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
@@ -136,16 +135,17 @@ for i in Ticker.Stock:
 xapka.columns = ["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","total"]
 #畫EMA趨勢線
 #plt.figure(num =3, figsize=(17,7)) 
-fig = plt.figure(num =1, figsize=(19,10))    #創建圖表
-sub1 = fig.add_subplot(2, 1, 1) # 添加子圖表1
-sub2 = fig.add_subplot(2, 1, 2) # 添加子圖表2
+fig = plt.figure(num =1, figsize=(18,9))    #創建圖表
+sub1 = fig.add_subplot(3, 1, 1) # 添加子圖表1
+sub2 = fig.add_subplot(3, 1, 2) # 添加子圖表2
+sub3 = fig.add_subplot(3, 1, 3) # 添加子圖表2
 sub1.plot(xapka["date"],xapka["close"],label="close" ,color = 'blue') 
 sub2.plot(xapka["date"],xapka["xema"],label="xema" , linewidth = 0.5, linestyle = '-' ,color = 'red') 
 sub2.plot(xapka["date"],xapka["xmacd"],label="xmacd" , linewidth = 0.5, linestyle = '--',color = 'green')  
-sub2.plot(xapka["date"],xapka["xsrsi"],label="xsrsi" , linewidth = 0.5, linestyle = '-.',color = 'brown') 
-sub2.plot(xapka["date"],xapka["xwillrd"],label="xwillrd" , linewidth = 0.5, linestyle = '--',color = 'black')  
-sub2.plot(xapka["date"],xapka["xBBand"],label="xBBand" , linewidth = 1, linestyle = '-.',color = 'indigo') 
-sub2.plot(xapka["date"],xapka["total"],label="total" , linewidth = 0.5, linestyle = ':',color = 'purple')
+sub3.plot(xapka["date"],xapka["xsrsi"],label="xsrsi" , linewidth = 0.5, linestyle = '-.',color = 'brown') 
+sub3.plot(xapka["date"],xapka["xwillrd"],label="xwillrd" , linewidth = 0.5, linestyle = '--',color = 'black')  
+sub3.plot(xapka["date"],xapka["xBBand"],label="xBBand" , linewidth = 1, linestyle = '-.',color = 'indigo') 
+#sub2.plot(xapka["date"],xapka["total"],label="total" , linewidth = 0.5, linestyle = ':',color = 'purple')
 for i in range(0,len(xapka)):
     if xapka.at[i,"total"] >=3 :
         sub1.text(xapka.at[i, "date"], xapka.at[i, "close"],'4',color='red')
