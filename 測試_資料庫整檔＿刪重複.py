@@ -65,7 +65,6 @@ for i in Ticker.Stock:
             "	    PARTITION BY [datetime] ORDER BY (SELECT NULL)"+\
             "	) FROM [Stock].[dbo].RowHour_"+ i.strip()+\
             ") AS T WHERE DupRank > 1"
- 
         cursor.execute(sql4)
         conn.commit()
     except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
