@@ -10,6 +10,7 @@ import apka_score_ploy
 import apka_count_EMA
 import apka_score_trend
 import apka_score_oscillate
+import apka_score_ploy
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
@@ -42,5 +43,14 @@ for i in Ticker.Stock:
     #data.set_index("date" , inplace=True)
     print('Ticker='+i)
     #apka_count_EMA.score_EMA(data) 
-    #apka_score_trend.score_trend(data)
-    apka_score_oscillate.score_oscillate(data)
+    apkaTre = apka_score_trend.score_trend(data)
+    apkaTre =apkaTre.drop(columns=["buy", "sell", "profit"])
+    #apkaTre.set_index('date')
+    apkaOsc = apka_score_oscillate.score_oscillate(data)
+    #apkaOsc =apkaOsc.drop(columns=["close","sum","buy", "sell", "profit"])
+    #apkaOsc.set_index('date')
+    apkaCom = pd.merge( apkaTre, apkaOsc)
+    #["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","sum", "xploy"]
+    apkaCom["OscSum"] = apkaCom["xsrsi"]+apkaCom["xwillrd"]+apkaCom["xBBand"]
+    #apkaCom.to_csv("apkaCom.csv")
+    apka_score_ploy.plot(apkaCom)

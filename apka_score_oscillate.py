@@ -70,8 +70,9 @@ def score_oscillate(data):
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   
 
-    xapka.columns = ["date", "close", "xsrsi", "xwillrd", "xBBand", "sum","buy", "sell", "profit"] 
-    
+    xapka.columns = ["date", "close", "xsrsi", "xwillrd", "xBBand", "OscSum","buy", "sell", "profit"]
+    return xapka
+    '''
     fig = plt.figure(num =1, figsize=(18,9))    #創建圖表
     sub1 = fig.add_subplot(2, 1, 1) # 添加子圖表1
     sub2 = fig.add_subplot(2, 1, 2) # 添加子圖表2
@@ -88,7 +89,7 @@ def score_oscillate(data):
         elif xapka.at[i, "sum"] <=-5:
             sub1.text(xapka.at[i, "date"],xapka.at[i, "close"],str(xapka.at[i, "date"])[5:10],rotation=90,color='red')
             sub2.text(xapka.at[i, "date"], xapka.at[i, "sum"],str(xapka.at[i, "date"])[5:10],rotation=90,color='red') 
-    '''
+    
     buy = 0.0
     BuySellway =''
     for i in range(1,len(xapka)):
@@ -112,10 +113,11 @@ def score_oscillate(data):
             total = total + total*xapka.at[i,"profit"]
     print("From [" + str(xapka.at[1,"date"]) +"] to ["+ str(xapka.at[len(xapka)-1,"date"]) +"] total =1000.0 after count: []"+str(count)+"] times total profit = "+str(total) )
     
-    '''
+    
     
     #Trade.TotProfit(xapka)
 
     plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
     plt.legend() 
     plt.show()
+    '''
