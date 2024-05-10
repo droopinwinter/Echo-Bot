@@ -6,7 +6,7 @@ from pandas import DataFrame,Series
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
-import apka_score_index
+import apka_score_trend
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
     conn = pymssql.connect(host="192.9.12.226:1433", user='sa', password='abc123', database='Stock',charset='GBK')
@@ -158,7 +158,7 @@ fig = plt.figure(num =1, figsize=(18,9))    #創建圖表
 sub1 = fig.add_subplot(3, 1, 1) # 添加子圖表1
 sub2 = fig.add_subplot(3, 1, 2) # 添加子圖表2
 sub3 = fig.add_subplot(3, 1, 3) # 添加子圖表2
-sub1.plot(xapka["date"],xapka["close"],label="close" ,color = 'blue') 
+sub1.plot(xapka["date"],xapka["close"],label="close" ,color = 'blue')        
 sub2.plot(xapka["date"],xapka["xema"],label="xema" , linewidth = 0.5, linestyle = '-' ,color = 'red') 
 sub2.plot(xapka["date"],xapka["xmacd"],label="xmacd" , linewidth = 0.5, linestyle = '--',color = 'green')  
 sub3.plot(xapka["date"],xapka["xsrsi"]  ,label="xsrsi"   , linewidth = 1,linestyle = '-',color = 'brown') 
