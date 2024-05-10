@@ -10,7 +10,6 @@ import apka_score_ploy
 import apka_count_EMA
 import apka_score_trend
 import apka_score_oscillate
-import apka_score_ploy
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
@@ -45,12 +44,60 @@ for i in Ticker.Stock:
     #apka_count_EMA.score_EMA(data) 
     apkaTre = apka_score_trend.score_trend(data)
     apkaTre =apkaTre.drop(columns=["buy", "sell", "profit"])
-    #apkaTre.set_index('date')
     apkaOsc = apka_score_oscillate.score_oscillate(data)
+    apkEma = apka_count_EMA.score_EMA(data)
+    
     #apkaOsc =apkaOsc.drop(columns=["close","sum","buy", "sell", "profit"])
     #apkaOsc.set_index('date')
     apkaCom = pd.merge( apkaTre, apkaOsc)
+    apkaCom = pd.merge( apkaCom, apkEma)
     #["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","sum", "xploy"]
     apkaCom["OscSum"] = apkaCom["xsrsi"]+apkaCom["xwillrd"]+apkaCom["xBBand"]
+    #xapka.columns = ["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","sum", "xploy"]
+    #print(apkaCom.head())
+    
+    cmb = pd.DataFrame()
+    for i in range(1,len(apkaCom)):
+        xema = apkaCom.at[i,"xema"] 
+        yema = apkaCom.at[i,"yema"] 
+        xmacd= apkaCom.at[i,"xmacd"]
+        xremark= ''
+        if  yema > apkaCom.at[i-1,"yema"]:
+            for  j in range(2,3):
+                if apkaCom.at[i-1,"yema"] == apkaCom.at[i-j,"yema"]: 
+                    xremark = '確認漲勢_K線回採GMMA_週期倍率' +  str(apkaCom.at[i,"EamCnt"] )
+                    xcmb = apkaCom.at[i,"OscSum"] + apkaCom.at[i,"EamCnt"]
+        elif yema < apkaCom.at[i-1,"yema"]:
+            for  j in range(2,3):
+                if apkaCom.at[i-1,"yema"] == apkaCom.at[i-j,"yema"]:             
+                    xremark = '確認跌勢_K線反彈GMMA_週期倍率' +  str(apkaCom.at[i,"EamCnt"] )
+                    xcmb = apkaCom.at[i,"OscSum"] - apkaCom.at[i,"EamCnt"]
+        elif xema >0 and xmacd>0:
+            #牛市修正<找買點 或牛市到頂轉空
+            xcmb = apkaCom.at[i,"OscSum"]+ xmacd + xema+ yema
+        elif xema >0 and xmacd<0:
+            #牛市修正<找買點 或牛市到頂轉空
+            if xmacd > apkaCom.at[i-1,"xmacd"]:
+                xcmb = apkaCom.at[i,"OscSum"] + xema + yema
+            else:
+                xcmb = apkaCom.at[i,"OscSum"]
+        elif xema == -2 and xmacd== -2:
+            #熊市找極端反轉
+            xcmb = apkaCom.at[i,"OscSum"] 
+        elif xema <0 and xmacd<0:
+            #熊市找賣空進場點
+            xcmb = apkaCom.at[i,"OscSum"]
+        else:
+            #震盪沒有方向<觀望
+            xcmb =apkaCom.at[i,"OscSum"]
+        a = [ apkaCom.at[i,'date'], xcmb, xremark]
+        cmb = pd.concat([cmb, pd.DataFrame([a])], ignore_index=True)
+    cmb.columns = ["date", "xcmb","xremark"]
+    #print(cmb.head())
+    apkaCom = pd.merge( apkaCom, cmb)    
+    
+
+
     #apkaCom.to_csv("apkaCom.csv")
     apka_score_ploy.plot(apkaCom)
+    

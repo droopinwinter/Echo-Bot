@@ -27,7 +27,34 @@ def PutOrCall( NowWaveSt, PreWaveSt):
         return -1
     else:
         return 0
-    
+
+def plot_EMA( CntEma ):
+    color_list =['black','sienna','red','orange','gold','green','blue','purple','grey','teal','black','sienna','red','orange','gold','green','blue','purple','grey','teal'] 
+    plt.figure(num =1, figsize=(18,9))    #創建圖表
+    plt.plot(CntEma["date"],CntEma["close"],  label="close"   ,color = 'blue')
+    for i in range(10,len(CntEma)):
+        xdate = CntEma.at[i, "date"]
+        yclose = CntEma.at[i, "close"]
+        for j in range(16,22):
+            rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
+            if rzt >0:
+                plt.text(xdate, yclose-5, str(j-13)+'_' +str(xdate)[5:10],rotation=90,color=color_list[j-16])
+            if rzt <0:
+                plt.text(xdate, yclose+5, str(j-13)+'_' +str(xdate)[5:10],rotation=90,color=color_list[j-16])      
+        '''
+                rzt = PutOrCall(CntEma.at[i,"Cntema23"], CntEma.at[i-1,"Cntema23"])
+        if rzt >0:
+            plt.text(xdate, yclose-5, '2_' +str(xdate)[5:10],rotation=90,color='red')
+        if rzt <0:
+            plt.text(xdate, yclose+5, '2_' +str(xdate)[5:10],rotation=90,color='blue')         
+        '''
+    for j in range(4,13):
+        plt.plot(CntEma["date"],CntEma.iloc[:,j],  label='ema'+str(j-3)   ,color = color_list[j-4])
+    #plt.xlabel("價位")\plt.ylabel("日期")
+    plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
+    plt.legend() 
+    plt.show()  
+
 def score_EMA( data ):
     print('apka_score_EMA')
     CntEma = pd.DataFrame()
@@ -55,35 +82,34 @@ def score_EMA( data ):
     CntEma.columns = ["date", "close","high","low",\
                     "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
                     "Cntema12","Cntema23", "Cntema34", "Cntema45", "Cntema56","Cntema67", "Cntema78", "Cntema89", "Cntema9A"]
-    #CntEma.to_csv("test.csv")
-    color_list = [
-        'black','sienna','red','orange','gold','green','blue','purple','grey','teal','black','sienna','red','orange','gold','green','blue','purple','grey','teal'
-    ] 
-    plt.figure(num =1, figsize=(18,9))    #創建圖表
-    plt.plot(CntEma["date"],CntEma["close"],  label="close"   ,color = 'blue')
+    
+    #plot_EMA( CntEma )
+    CntEma =CntEma.drop(columns=[ "close","high","low","ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"])
+    #CntEma.to_csv("test_apka_count_EMA.csv")
+    TredEma = pd.DataFrame()
+    yema     = 0
     for i in range(10,len(CntEma)):
-        xdate = CntEma.at[i, "date"]
-        yclose = CntEma.at[i, "close"]
-        for j in range(16,22):
-            rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
-            if rzt >0:
-                plt.text(xdate, yclose-5, str(j-13)+'_' +str(xdate)[5:10],rotation=90,color=color_list[j-16])
-            if rzt <0:
-                plt.text(xdate, yclose+5, str(j-13)+'_' +str(xdate)[5:10],rotation=90,color=color_list[j-16])
-                
-        '''
-                rzt = PutOrCall(CntEma.at[i,"Cntema23"], CntEma.at[i-1,"Cntema23"])
-        if rzt >0:
-            plt.text(xdate, yclose-5, '2_' +str(xdate)[5:10],rotation=90,color='red')
-        if rzt <0:
-            plt.text(xdate, yclose+5, '2_' +str(xdate)[5:10],rotation=90,color='blue')         
-        '''
-    for j in range(4,13):
-        plt.plot(CntEma["date"],CntEma.iloc[:,j],  label='ema'+str(j-3)   ,color = color_list[j-4])
+        try:
+            EmaState =0
+            EamCnt   =0
+            #yema     = 0
+            for j in range(3,9):
+                if CntEma.iat[i,j] > EmaState :
+                    EamCnt =j
+                    EmaState = CntEma.iat[i,j]
+                rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
+                if rzt >0:
+                    yema += 1
+                elif rzt <0:
+                    yema -= 1
+            a = [ CntEma.at[i,'date'], EamCnt, EmaState, yema ]
+            TredEma = pd.concat([TredEma, pd.DataFrame([a])], ignore_index=True)            
+        except Exception as errMsg: 
+            print('每K線EMA錯誤-', str(data.at[j,'date']) , errMsg)
+    TredEma.columns = ["date", "EamCnt","EmaState","yema"]                    
+    #TredEma.to_csv("test1_apka_count_EMA.csv")    
+    return TredEma
 
-    plt.title("計算EMA回踩測次數")
-    plt.xlabel("價位")
-    plt.ylabel("日期")
-    plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
-    plt.legend() 
-    plt.show()  
+
+
+
