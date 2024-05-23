@@ -11,29 +11,30 @@ from talib import abstract
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
-    conn = pymssql.connect(host="192.9.12.226:1433", user='sa', password='abc123', database='Stock',charset='GBK')
+    conn = pymssql.connect(host="192.9.12.226:1433", user='sa', password='abc123', database='analsy',charset='GBK')
     cursor = conn.cursor()    
     engine = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/Stock?charset=GBK")
     engine1 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/analsy?charset=GBK")
+
     sql = 'select * FROM [Stock].[dbo].[TechAnalysis] '
     pd_TechAnalysis = pd.read_sql(sql, engine)
-
+    
     sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     pd_read_sql = pd.read_sql(sql2, engine)
     for i in pd_read_sql.Stock:
         print('Stock_'+i)
         try:
-            #日K
-            sql3 = 'select max(Date) Date FROM [Stock].[dbo].' +i.strip()+'_AnalysDay '
-            SqlMaxDate = pd.read_sql(sql3, engine).iat[0, 0].strftime("%Y-%m-%d")
-            sql4 = "DELETE [Stock].[dbo]."+ i.strip()+'_AnalysDay ' +"Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
+            #SRSI
+            sql3 = 'select max(Date) Date FROM [analsy].[dbo].AnalysDay_' +i.strip()
+            SqlMaxDate = pd.read_sql(sql3, engine1).iat[0, 0].strftime("%Y-%m-%d")
+            sql4 = "DELETE [analsy].[dbo].AnalysDay_"+ i.strip()+" Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
             cursor.execute(sql4)
             conn.commit()
 
             sql3 = 'select top 1000 Date FROM [Stock].[dbo].[RowDay_'+i.strip()+'] order by date desc'
             SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select distinct [Date],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000'"
+            sql3 = "select * FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000'"
             data = pd.read_sql(sql3, engine, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
@@ -58,7 +59,7 @@ try:
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
                         "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
-                data.to_sql( 'AnalysDay_'+i.strip(),engine,if_exists='append', index=False)
+                data.to_sql( 'AnalysDay_'+i.strip(),engine1,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', i.strip() , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
@@ -66,15 +67,15 @@ try:
 
         try:
             #小時K
-            sql3 = 'select max(Date) Date FROM [Stock].[dbo].' +i.strip()+'_AnalysHour '
-            SqlMaxDate = pd.read_sql(sql3, engine).iat[0, 0].strftime("%Y-%m-%d")
-            sql4 = "DELETE [Stock].[dbo]."+ i.strip()+'_AnalysHour ' +"Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
+            sql3 = 'select max(Date) Date FROM [analsy].[dbo].AnalysHour_' +i.strip()
+            SqlMaxDate = pd.read_sql(sql3, engine1).iat[0, 0].strftime("%Y-%m-%d")
+            sql4 = "DELETE [analsy].[dbo].AnalysHour_"+ i.strip()+" Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
             cursor.execute(sql4)
             conn.commit()
 
             sql3 = 'select top 1000 Datetime Date FROM [Stock].[dbo].[RowHour_'+i.strip()+'] order by date desc'
             SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select distinct [Datetime],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000'"
+            sql3 = "select * FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000'"
             data = pd.read_sql(sql3, engine, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
@@ -98,7 +99,7 @@ try:
                         "willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
-                        "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]
+                        "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
                 data.to_sql( 'AnalysHour_'+i.strip(),engine1,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', i.strip() , errMsg)    
