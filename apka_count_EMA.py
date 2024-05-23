@@ -56,7 +56,7 @@ def plot_EMA( CntEma ):
     plt.show()  
 
 def score_EMA( data ):
-    print('apka_score_EMA')
+    #print('apka_score_EMA')
     CntEma = pd.DataFrame()
     Cntema12 =Cntema23 =Cntema34 =Cntema45 =Cntema56 =Cntema67 =Cntema78 =Cntema89 =Cntema9A =0    
     for j in range(1,len(data)):
@@ -93,7 +93,7 @@ def score_EMA( data ):
             EmaState =0
             EamCnt   =0
             #yema     = 0
-            for j in range(3,9):
+            for j in range(3,10):
                 if CntEma.iat[i,j] > EmaState :
                     EamCnt =j
                     EmaState = CntEma.iat[i,j]

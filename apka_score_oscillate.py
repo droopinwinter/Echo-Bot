@@ -14,10 +14,10 @@ def score_oscillate(data):
                 for k in range(j-10,j): 
                     if  data.at[k, 'fastk_w'] < data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] < 20 :
                         xsrsi = 2
-            elif data.at[j, 'fastk_d'] < data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] > 80 :
+            elif data.at[j, 'fastk_d'] < data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] > 90 :
                 xsrsi = -1
                 for k in range(j-10,j): 
-                    if data.at[k, 'fastk_w'] > data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] > 80 :
+                    if data.at[k, 'fastk_w'] > data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] > 90 :
                         xsrsi = -2
             else:
                 xsrsi = 0  
