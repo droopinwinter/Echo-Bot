@@ -7,31 +7,48 @@ import Trade
 def score_trend(data):
     xapka = pd.DataFrame()
     for j in range(10,len(data)):
-        try:        
+        try:      
             #利用EMA和MACD判斷長週期上升趨勢做多或空
             if data.at[j, 'ema1'] > data.at[j, 'ema2']:
                 xema =1 
                 if data.at[j, 'ema2'] > data.at[j, 'ema3']:
-                    xema =2 
+                    xema =2
+                    if data.at[j, 'ema3'] > data.at[j, 'ema4']:
+                        xema =3
+                        if data.at[j, 'ema4'] > data.at[j, 'ema5']:
+                            xema =4
             elif data.at[j, 'ema1'] < data.at[j, 'ema2']:
                 xema =-1 
                 if data.at[j, 'ema2'] < data.at[j, 'ema3']:
-                    xema =-2 
+                    xema =-2
+                    if data.at[j, 'ema3'] < data.at[j, 'ema4']:
+                        xema =-3
+                        if data.at[j, 'ema4'] < data.at[j, 'ema5']:
+                            xema =-4
             else:
                 xema = 0 #無法識別走勢<持倉或觀望不操作
-            #短線判斷進出場信號            
-            
+            #短線判斷進出場信號
+                
             #xema = apka_score_index.score_ema(data.iloc[j-10:j,:])
             if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d']:
                 xmacd =1
-                if data.at[j-1, 'MACD_w'] > data.at[j-1, 'signal_w']:
-                    xmacd =2                        
+                if data.at[j, 'MACD_d'] > 0:
+                    xmacd =2
+                    if data.at[j-1, 'MACD_w'] > data.at[j-1, 'signal_w']:
+                        xmacd =3 
+                        if data.at[j, 'MACD_w'] > 0:
+                            xmacd =4                       
             elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d']:
                 xmacd =-1
-                if data.at[j-1, 'MACD_w'] < data.at[j-1, 'signal_w']:
+                if data.at[j, 'MACD_d'] < 0:
                     xmacd =-2
+                    if data.at[j-1, 'MACD_w'] < data.at[j-1, 'signal_w']:
+                        xmacd =-3
+                        if data.at[j, 'MACD_w'] < 0:
+                            xmacd =-4  
             else:
                 xmacd =0
+
             a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd,0, 0, 0, 0.0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
         except Exception as errMsg: 
