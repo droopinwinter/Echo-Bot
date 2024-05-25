@@ -18,16 +18,16 @@ def TotProfit(xapka, Ticker):
         xcmb  = xapka.at[i,"xcmb"]
         prebuy  = xapka.at[i-1,"buy"]
         if prebuy ==0:
-            if xmacd >0:
-                if   (OscSum >=  6) or ( OscSum < 5 and xapka.at[i,"OscSum"] == 5 ):
-                    return 10
-                elif ( OscSum < 4 and xapka.at[i,"OscSum"] == 4 ):
-                    return 11
-                elif  (yema > xapka.at[i-1,"yema"]  and yema >=1):
-                    return yema                          
-            elif xmacd <0:                
-                if (yema < xapka.at[i-1,"yema"] and yema <=0) :
-                    return yema               
+            if   (OscSum >=  6) or ( OscSum < 5 and xapka.at[i,"OscSum"] == 5 ) and xmacd <-1:
+                return 10
+            elif ( OscSum < 4 and xapka.at[i,"OscSum"] == 4 ) and xmacd <-1:
+                return 11
+            elif  yema > xapka.at[i-1,"yema"]  and yema >=1 and xema >0:
+                return yema                          
+            elif yema < xapka.at[i-1,"yema"] and yema <=1 and OscSum <2 and xema <0:
+                return yema
+            elif (xema >0 and xmacd >0 and xapka.at[i-1,"xmacd"] <=0 ) :
+                return 20
         else:
             return 0
         
@@ -47,7 +47,9 @@ def TotProfit(xapka, Ticker):
         elif yema > xapka.at[i-1,"yema"] and Prebuy < 0 :
             return Prebuy
         elif  yema < xapka.at[i-1,"yema"] and Prebuy > 0 and Prebuy < 10: #and Prebuy == xapka.at[i-1,"yema"]
-            return Prebuy     
+            return Prebuy
+        elif Prebuy ==20 and (OscSum <=-4 or (xmacd < 0 and xapka.at[i-1,"xmacd"]>=0 )) :     
+            return Prebuy
         else:
             return 0
 
