@@ -59,6 +59,7 @@ for i in Ticker.Stock:
 for i in Ticker.Stock:
     print('Stock_'+i)
     try:
+        '''
         sql4 = \
             "DELETE T FROM ("+\
             "	SELECT *, DupRank = ROW_NUMBER() OVER ("+\
@@ -66,13 +67,13 @@ for i in Ticker.Stock:
             "	) FROM [analsy].[dbo].AnalysHour_"+ i.strip()+\
             ") AS T WHERE DupRank > 1"
         '''
-         sql4 = \
+        sql4 = \
             "DELETE T FROM ("+\
             "	SELECT *, DupRank = ROW_NUMBER() OVER ("+\
             "	    PARTITION BY [date] ORDER BY (SELECT NULL)"+\
-            "	) FROM [analsy].[dbo].AnalysDate_"+ i.strip()+\
+            "	) FROM [analsy].[dbo].AnalysDay_"+ i.strip()+\
             ") AS T WHERE DupRank > 1"
-        '''
+        
         cursor.execute(sql4)
         conn.commit()
     except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容

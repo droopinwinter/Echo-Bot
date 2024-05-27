@@ -15,6 +15,7 @@ def plot(xapka, xcode):
     plt.title('Ticker='+xcode+StrTime)
     plt.plot(xapka["date"],xapka["close"],  label=xcode , linewidth = 1, linestyle = '-'  ,color = 'blue')
     plt.plot(xapka["date"],xapka["close"] + 10*xapka["xmacd"],  label="xmacd"   , linewidth = 0.5, linestyle = '--',color = 'teal')  
+    plt.plot(xapka["date"],xapka["close"] + 15*xapka["xema"],  label="xmacd"   , linewidth = 0.5, linestyle = '--',color = 'red')  
     plt.grid()
     plt.legend(loc =2)
     plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
@@ -28,26 +29,26 @@ def plot(xapka, xcode):
         Xprofit = str( xapka.at[i,"profit"].round(3))
         if xapka.at[i,"buy"] >=1 and xapka.at[i-1,"buy"] ==0:
             Yaxis =  Yaxis*0.99
-            plt.text(Xaxis, sPrice,str(Xbuy)+'_'+str(Xaxis)[5:10]+Xclose,rotation=90,color='red')
+            plt.text(Xaxis, sPrice,str(Xbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose,rotation=90,color='red')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='red')
         elif xapka.at[i,"buy"] ==0 and xapka.at[i-1,"buy"] >=1:
             Yaxis =  Yaxis*1.01            
-            plt.text(Xaxis,sPrice,str(Pbuy)+'_'+str(Xaxis)[5:10]+Xclose+'_'+Xprofit,rotation=90,color='blue')
+            plt.text(Xaxis,sPrice,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose+'_'+Xprofit,rotation=90,color='blue')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='blue')
         elif xapka.at[i,"buy"] <=-1 and xapka.at[i-1,"buy"] ==0:
             Yaxis =  Yaxis*1.01            
-            plt.text(Xaxis,sPrice,str(Xbuy)+'_'+str(Xaxis)[5:10]+Xclose,rotation=90,color='black')
+            plt.text(Xaxis,sPrice,str(Xbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose,rotation=90,color='black')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='black')
         elif xapka.at[i,"buy"] ==0 and xapka.at[i-1,"buy"] <=-1:
             Yaxis =  Yaxis*0.99            
-            plt.text(Xaxis,sPrice,str(Pbuy)+'_'+str(Xaxis)[5:10]+Xclose+'_'+Xprofit,rotation=90,color='sienna')
+            plt.text(Xaxis,sPrice,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose+'_'+Xprofit,rotation=90,color='sienna')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='sienna')
 
 
 
     plt.subplot(2, 1, 2) # 添加子圖表2
-    plt.plot(xapka["date"],xapka["xcmb"],   label="xcmb"    , linewidth = 1, linestyle = '-' ,color = 'red') 
-    plt.plot(xapka["date"],xapka["xmacd"],  label="xmacd"   , linewidth = 1, linestyle = '--',color = 'teal') 
+    #plt.plot(xapka["date"],xapka["xcmb"],   label="xcmb"    , linewidth = 1, linestyle = '-' ,color = 'red') 
+    #plt.plot(xapka["date"],xapka["xmacd"],  label="xmacd"   , linewidth = 1, linestyle = '--',color = 'teal') 
     plt.plot(xapka["date"],xapka["yema"],  label="yema"   , linewidth = 1, linestyle = '--',color = 'sienna')
     #plt.plot(xapka["date"],xapka["xcmb"],  label="xcmb"   , linewidth = 2, linestyle = '--',color = 'orange')  
     #sub2.plot(xapka["date"],xapka["xsrsi"],  label="xsrsi"   , linewidth = 1,linestyle = '-',color = 'brown') 
