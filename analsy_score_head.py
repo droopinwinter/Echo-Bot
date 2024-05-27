@@ -13,6 +13,24 @@ import apka_score_oscillate
 import analsy_score_xcom
 import Trade
 
+def sqlCommand( xcode, kind):
+        #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000'
+    # > '2021-05-03 00:00:00.000'
+
+    BaseSql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
+            [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
+            [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
+            FROM [analsy].[dbo]."
+    if   kind ==1:
+        sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '2021-05-03 00:00:00.000'" #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "
+    elif kind ==2:
+        sql = BaseSql +"[AnalysHour_3_"+xcode+"] WHere date > '2024-02-03 00:00:00.000'" 
+    else:
+        sql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
+                [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
+                [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
+                FROM [analsy].[dbo].[AnalysDay_"+xcode+"] WHere date between '202-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "        
+    return sql
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
@@ -20,31 +38,22 @@ try:
     cursor = conn.cursor()    
     engine = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/Stock?charset=GBK")
     engine1 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/analsy?charset=GBK")
+    engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
+    engine3 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/trade?charset=GBK")
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
-    CurrDate = datetime.now().strftime("%Y-%m-%d")   
+    CurrDate = datetime.now().strftime("%Y-%m-%d")
+    StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")   
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
     print('連線SQL發生錯誤-' , errMsg)
 
 TotTredRoc = pd.DataFrame()
 for xcode in Ticker.Stock:
-   
-    sql3 = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
-            [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
-            [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
-            FROM [analsy].[dbo].[AnalysDay_"+xcode.strip()+"] WHere date > '2021-05-03 00:00:00.000'"
-    #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000'
+    sql3 = sqlCommand( xcode.strip() ,1)
 
-    
-    '''
-    sql3 = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
-            [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
-            [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
-            FROM [analsy].[dbo].[AnalysHour_3_"+xcode.strip()+"] WHere date > '2024-02-03 00:00:00.000'"
-    '''
     data = pd.read_sql(sql3, engine1, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
                     "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
@@ -87,9 +96,10 @@ for xcode in Ticker.Stock:
     '''
     SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip())
     #apkaCom.to_csv("apkaCom.csv")
-    apka_score_ploy.plot(apkaCom, xcode.strip())
+    
     TotTredRoc = pd.concat([TotTredRoc, SingTredRoc], ignore_index=True)
-#TotTredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
-t = datetime.now()
-StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
-TotTredRoc.to_csv(   '..\\tradeRecord\\TotTredRoc'+StrTime+'.csv')   
+    #TotTredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
+    #t = datetime.now()
+    #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
+    TotTredRoc.to_sql('TradeRecord',engine3,if_exists='append', index=False)
+    #apka_score_ploy.plot(apkaCom, xcode.strip())

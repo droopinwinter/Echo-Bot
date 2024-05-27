@@ -20,13 +20,13 @@ def TotProfit(xapka, Ticker):
         if prebuy ==0:
             if   (OscSum >=  6) or ( OscSum < 5 and xapka.at[i-1,"OscSum"] == 5 ) and xmacd <-1:
                 return 10
-            #elif ( OscSum < 4 and xapka.at[i-1,"OscSum"] == 4 ) and xmacd <-1:
-            #    return 11
+            elif ( OscSum < 4 and xapka.at[i-1,"OscSum"] == 4 ) or ( OscSum < 3 and xapka.at[i-1,"OscSum"] == 3 ) and xmacd <-1:
+                return 11
             elif  yema > xapka.at[i-1,"yema"]  and yema >=1 and xema >0:
                 return yema                          
             elif yema < xapka.at[i-1,"yema"] and yema <=1 and OscSum <2 and xema <0:
                 return yema
-            elif (xema >0 and xmacd >0 )and ( xapka.at[i-1,"xmacd"] <=0  or xapka.at[i-1,"xema"] <=0) and xTrnSlop>0:
+            elif (xema >0 and xmacd >0 )and ( xapka.at[i-1,"xmacd"] <=0  or xapka.at[i-1,"xema"] <=0) and xTrnSlop>0 :
                 return 20
             #elif (xema <0 and xmacd <0 )and ( xapka.at[i-1,"xmacd"] >=0  or xapka.at[i-1,"xema"] >=0) and xTrnSlop<0 :
             #    return -20            

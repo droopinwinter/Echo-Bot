@@ -16,7 +16,7 @@ def score_xcom(apkaCom):
         xremark= ''        
         xcmb =0
         xstate = 0
-        for j in range(1,5):
+        for j in range(1,3):
             xstate +=(apkaCom.at[i-j+1,"xmacd"] - apkaCom.at[i-j,"xmacd"])
 
         if  (yema > apkaCom.at[i-1,"yema"] and yema>0) and ( xmacd >0 or xmacd > apkaCom.at[i-1,"xmacd"] ) and ( OscSum> apkaCom.at[i-1,"OscSum"]):

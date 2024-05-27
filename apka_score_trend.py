@@ -9,7 +9,7 @@ def score_trend(data):
     for j in range(10,len(data)):
         try:      
             #利用EMA和MACD判斷長週期上升趨勢做多或空
-            if data.at[j, 'ema1'] > data.at[j, 'ema2']:
+            if data.at[j, 'ema1'] > data.at[j, 'ema2'] and data.at[j, 'ema2'] >= data.at[j-1, 'ema2']:
                 xema =1 
                 if data.at[j, 'ema2'] > data.at[j, 'ema3']:
                     xema =2
@@ -17,7 +17,7 @@ def score_trend(data):
                         xema =3
                         if data.at[j, 'ema4'] > data.at[j, 'ema5']:
                             xema =4
-            elif data.at[j, 'ema1'] < data.at[j, 'ema2']:
+            elif data.at[j, 'ema1'] < data.at[j, 'ema2'] and data.at[j, 'ema2'] <= data.at[j-1, 'ema2']:
                 xema =-1 
                 if data.at[j, 'ema2'] < data.at[j, 'ema3']:
                     xema =-2
@@ -30,7 +30,7 @@ def score_trend(data):
             #短線判斷進出場信號
                 
             #xema = apka_score_index.score_ema(data.iloc[j-10:j,:])
-            if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d']:
+            if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d'] and data.at[j, 'signal_d'] >= data.at[j-1, 'signal_d']:
                 xmacd =1
                 if data.at[j, 'MACD_d'] > 0:
                     xmacd =2
@@ -38,7 +38,7 @@ def score_trend(data):
                         xmacd =3 
                         if data.at[j, 'MACD_w'] > 0:
                             xmacd =4                       
-            elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d']:
+            elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] and data.at[j, 'signal_d'] <= data.at[j-1, 'signal_d']:
                 xmacd =-1
                 if data.at[j, 'MACD_d'] < 0:
                     xmacd =-2
@@ -49,12 +49,15 @@ def score_trend(data):
             else:
                 xmacd =0
 
-            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd,0, 0, 0, 0.0]
+
+            xstate =(data.at[j,"ema3"] - data.at[j-1,"ema3"]) + (data.at[j,"ema3"] - data.at[j-2,"ema3"])
+
+            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, xstate, 0, 0, 0.0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   
 
-    xapka.columns = ["date", "close", "xema", "xmacd", "TrnSum", "buy", "sell", "profit"] 
+    xapka.columns = ["date", "close", "xema", "xmacd", "TrnSlop", "buy", "sell", "profit"] 
     return xapka
     '''
     fig = plt.figure(num =1, figsize=(18,9))    #創建圖表

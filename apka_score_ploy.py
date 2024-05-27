@@ -15,7 +15,7 @@ def plot(xapka, xcode):
     plt.title('Ticker='+xcode+StrTime)
     plt.plot(xapka["date"],xapka["close"],  label=xcode , linewidth = 1, linestyle = '-'  ,color = 'blue')
     plt.plot(xapka["date"],xapka["close"] + 10*xapka["xmacd"],  label="xmacd"   , linewidth = 0.5, linestyle = '--',color = 'teal')  
-    plt.plot(xapka["date"],xapka["close"] + 15*xapka["xema"],  label="xmacd"   , linewidth = 0.5, linestyle = '--',color = 'red')  
+    plt.plot(xapka["date"],xapka["close"] + 15*xapka["xema"],  label="xema"   , linewidth = 0.5, linestyle = '--',color = 'red')  
     plt.grid()
     plt.legend(loc =2)
     plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
