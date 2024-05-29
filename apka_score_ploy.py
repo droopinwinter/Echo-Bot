@@ -26,22 +26,30 @@ def plot(xapka, xcode):
         Pbuy    = xapka.at[i-1, "buy"]
         sPrice  = xapka.at[0, "close"]
         Xclose  = str(xapka.at[i, "close"].round(2))
-        Xprofit = str( xapka.at[i,"profit"].round(3))
+        Xprofit =  xapka.at[i,"profit"].round(3)
         if xapka.at[i,"buy"] >=1 and xapka.at[i-1,"buy"] ==0:
             Yaxis =  Yaxis*0.99
             plt.text(Xaxis, sPrice,str(Xbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose,rotation=90,color='red')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='red')
         elif xapka.at[i,"buy"] ==0 and xapka.at[i-1,"buy"] >=1:
-            Yaxis =  Yaxis*1.01            
-            plt.text(Xaxis,sPrice,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose+'_'+Xprofit,rotation=90,color='blue')
+            Yaxis =  Yaxis*1.01
+            if Xprofit>0:
+                hmove = 20
+            else:
+                hmove = 0
+            plt.text(Xaxis,sPrice+hmove,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose+'_'+str(Xprofit),rotation=90,color='blue')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='blue')
         elif xapka.at[i,"buy"] <=-1 and xapka.at[i-1,"buy"] ==0:
             Yaxis =  Yaxis*1.01            
             plt.text(Xaxis,sPrice,str(Xbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose,rotation=90,color='black')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='black')
         elif xapka.at[i,"buy"] ==0 and xapka.at[i-1,"buy"] <=-1:
-            Yaxis =  Yaxis*0.99            
-            plt.text(Xaxis,sPrice,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose+'_'+Xprofit,rotation=90,color='sienna')
+            Yaxis =  Yaxis*0.99
+            if Xprofit>0:
+                hmove = 20
+            else:
+                hmove = 0            
+            plt.text(Xaxis,sPrice+hmove,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+Xclose+'_'+str(Xprofit),rotation=90,color='sienna')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='sienna')
 
 
@@ -60,18 +68,23 @@ def plot(xapka, xcode):
         Xbuy    = xapka.at[i, "buy"]
         Pbuy    = xapka.at[i-1, "buy"]
         Xclose  = str(xapka.at[i, "close"].round(2))
-        Xprofit = str( xapka.at[i,"profit"].round(3))
+        iXprofit = xapka.at[i,"profit"].round(3)
+        sXprofit = str( iXprofit )
+        if iXprofit>0:
+            hmove = 8
+        else:
+            hmove = 0
         if xapka.at[i,"buy"] >=1 and xapka.at[i-1,"buy"] ==0:
             plt.text(Xaxis, -5    ,str(Xbuy)+'_'+str(Xaxis)[5:10],rotation=90,color='red')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='red')
         elif xapka.at[i,"buy"] ==0 and xapka.at[i-1,"buy"] >=1:
-            plt.text(Xaxis,-6  ,str(Pbuy)+'_'+str(Xaxis)[5:10],rotation=90,color='blue')
+            plt.text(Xaxis,-6+hmove  ,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+sXprofit,rotation=90,color='blue')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='blue')
         elif xapka.at[i,"buy"] <=-1 and xapka.at[i-1,"buy"] ==0:
             plt.text(Xaxis,-5    ,str(Xbuy)+'_'+str(Xaxis)[5:10],rotation=90,color='black')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='black')
         elif xapka.at[i,"buy"] ==0 and xapka.at[i-1,"buy"] <=-1:
-            plt.text(Xaxis,-5   ,str(Pbuy)+'_'+str(Xaxis)[5:10],rotation=90,color='sienna')
+            plt.text(Xaxis,-5+hmove ,str(Pbuy)+'_'+str(Xaxis)[5:10]+'_'+sXprofit,rotation=90,color='sienna')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='sienna')
     
 

@@ -22,7 +22,7 @@ def sqlCommand( xcode, kind):
             [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
             FROM [analsy].[dbo]."
     if   kind ==1:
-        sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '2021-05-03 00:00:00.000'" #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "
+        sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date between '2021-05-12 00:00:00.000' and '2022-05-03 00:00:00.000' " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "
     elif kind ==2:
         sql = BaseSql +"[AnalysHour_3_"+xcode+"] WHere date > '2024-02-03 00:00:00.000'" 
     else:
@@ -43,7 +43,7 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")   
@@ -101,5 +101,5 @@ for xcode in Ticker.Stock:
     #TotTredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
     #t = datetime.now()
     #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
-    TotTredRoc.to_sql('TradeRecord',engine3,if_exists='append', index=False)
-    #apka_score_ploy.plot(apkaCom, xcode.strip())
+    TotTredRoc.to_sql('TradeRecord_SPY',engine3,if_exists='append', index=False)
+    apka_score_ploy.plot(apkaCom, xcode.strip())

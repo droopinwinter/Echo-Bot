@@ -19,17 +19,20 @@ def TotProfit(xapka, Ticker):
         prebuy  = xapka.at[i-1,"buy"]
         if prebuy ==0:
             if   (OscSum >=  6) or ( OscSum < 5 and xapka.at[i-1,"OscSum"] == 5 ) and xmacd <-1:
-                return 10
-            #elif ( OscSum < 4 and xapka.at[i-1,"OscSum"] == 4 ) and xmacd <-1:
-            #    return 11
-            elif  yema > xapka.at[i-1,"yema"]  and yema >=1 and xema >0:
-                return yema                          
-            elif yema < xapka.at[i-1,"yema"] and yema <=1 and OscSum <2 and xema <0:
-                return yema
-            elif (xema >0 and xmacd >0 )and ( xapka.at[i-1,"xmacd"] <=0  or xapka.at[i-1,"xema"] <=0) and xTrnSlop>0:
-                return 20
-            #elif (xema <0 and xmacd <0 )and ( xapka.at[i-1,"xmacd"] >=0  or xapka.at[i-1,"xema"] >=0) and xTrnSlop<0 :
-            #    return -20            
+                return 10 #+極端交易
+            #elif ( OscSum < 4 and xapka.at[i-1,"OscSum"] == 4 ) and xmacd <=-1:
+            #    return 11 #+極端交易
+            #elif OscSum <= -6 and xmacd >=4 and xema >=4 and xTrnSlop<=0:
+            #    return -11            
+            elif  yema > xapka.at[i-1,"yema"]  and yema >=1 and xema >0 and xTrnSlop>=0:
+                return yema  #+GMMA交易                        
+            #elif yema < xapka.at[i-1,"yema"] and yema <=-1 and xema <0 and xTrnSlop<=0:
+            #    return yema #-GMMA交易
+            elif  xmacd >0 and xapka.at[i-1,"xmacd"] <=0 and xTrnSlop>0:
+            #elif (xema >0 and xmacd >0 )and ( xapka.at[i-1,"xmacd"] <=0  or xapka.at[i-1,"xema"] <=0) and xTrnSlop>0:                
+                return 20 #+趨勢交易
+            elif  xmacd <0 and xapka.at[i-1,"xmacd"] >=0 and xTrnSlop<0 :
+                return -20            
         else:
             return 0
         
@@ -43,17 +46,19 @@ def TotProfit(xapka, Ticker):
         Prebuy = xapka.at[i-1,"buy"]
         
         if   Prebuy == 10 and (xmacd == 4 or  (OscSum<=-1 and xmacd <0) )  :
-            return Prebuy
+            return Prebuy #+極端交易
         elif Prebuy == 11 and OscSum == 0 :
-            return Prebuy
-        elif Prebuy < 0   and ( OscSum>=4 or yema > xapka.at[i-1,"yema"]):
-            return Prebuy
-        elif Prebuy > 0   and Prebuy < 10 and yema < xapka.at[i-1,"yema"] : #and Prebuy == xapka.at[i-1,"yema"]
-            return Prebuy
+            return Prebuy #+極端交易
+        elif Prebuy == -11 and OscSum == 0 :
+            return Prebuy  #-極端交易      
+        elif Prebuy < 0 and Prebuy > -10 and ( OscSum>=2 or xmacd > xapka.at[i-1,"xmacd"]):
+            return Prebuy #-GMMA交易
+        elif Prebuy > 0   and Prebuy < 10 and (yema < xapka.at[i-1,"yema"] or xmacd < xapka.at[i-1,"xmacd"] ): #and Prebuy == xapka.at[i-1,"yema"]
+            return Prebuy #+GMMA交易
         elif Prebuy ==20  and (OscSum <=-4 or (xmacd < xapka.at[i-1,"xmacd"] )) :     
-            return Prebuy
-        #elif Prebuy ==-20  and (OscSum >=4 or (xmacd > xapka.at[i-1,"xmacd"] )) :     
-        #    return Prebuy        
+            return Prebuy #+趨勢交易
+        elif Prebuy ==-20  and (OscSum >=1 or (xmacd > xapka.at[i-1,"xmacd"] )) :     
+            return Prebuy        
         else:
             return 0
 

@@ -30,7 +30,9 @@ def score_trend(data):
             #短線判斷進出場信號
                 
             #xema = apka_score_index.score_ema(data.iloc[j-10:j,:])
-            if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d'] and data.at[j, 'signal_d'] >= data.at[j-1, 'signal_d']:
+            MacdSlop =(data.at[j,"signal_d"] - data.at[j-1,"signal_d"]) + (data.at[j,"signal_d"] - data.at[j-2,"signal_d"])
+            
+            if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d'] and MacdSlop>0:#data.at[j, 'signal_d'] >= data.at[j-1, 'signal_d']:
                 xmacd =1
                 if data.at[j, 'MACD_d'] > 0:
                     xmacd =2
@@ -38,7 +40,7 @@ def score_trend(data):
                         xmacd =3 
                         if data.at[j, 'MACD_w'] > 0:
                             xmacd =4                       
-            elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] and data.at[j, 'signal_d'] <= data.at[j-1, 'signal_d']:
+            elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] and MacdSlop<0:#data.at[j, 'signal_d'] <= data.at[j-1, 'signal_d']:
                 xmacd =-1
                 if data.at[j, 'MACD_d'] < 0:
                     xmacd =-2

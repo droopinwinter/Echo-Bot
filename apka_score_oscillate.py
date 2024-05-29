@@ -36,17 +36,18 @@ def score_oscillate(data):
             #"upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m"
             # (data.at[j, 'high'] - data.at[j, 'mid_d'])/(data.at[j, 'upp_d'] - data.at[j, 'mid_d']) > 0.9
             LongShort = data.at[j, 'mid_d'] - data.at[j-1, 'mid_d']
-            BandWidth = data.at[j, 'upp_d'] - data.at[j, 'low_d']
-            level     = data.at[j, 'close'] - data.at[j, 'low_d']
-            wBandWidth = data.at[j, 'upp_w'] - data.at[j, 'low_w']
-            wlevel     = data.at[j, 'close'] - data.at[j, 'low_w']
-            if level/BandWidth >0.8: 
+            BandWidth = (data.at[j, 'upp_d'] - data.at[j, 'low_d'])+1e-15
+            level     = (data.at[j, 'close'] - data.at[j, 'low_d'])/BandWidth
+
+            wBandWidth = (data.at[j, 'upp_w'] - data.at[j, 'low_w'])+1e-15
+            wlevel     = (data.at[j, 'close'] - data.at[j, 'low_w'])/wBandWidth
+            if level >0.8: 
                 xBBand = -1
-                if wlevel/wBandWidth >0.8:
+                if wlevel >0.8:
                      xBBand = -2
-            elif level/BandWidth < 0.2:
+            elif level < 0.2:
                 xBBand = 1
-                if wlevel/wBandWidth < 0.2:
+                if wlevel < 0.2:
                     xBBand = 2
             else:
                 xBBand = 0
@@ -65,12 +66,12 @@ def score_oscillate(data):
             '''
             sum= xBBand+xsrsi+xwillrd    
             #===========================================================================================
-            a=[ data.at[j,'date'],data.at[j,'close'], xsrsi, xwillrd,xBBand, sum, 0, 0, 0.0]
+            a=[ data.at[j,'date'],data.at[j,'close'], xsrsi, xwillrd,xBBand, sum, level, 0, 0, 0.0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   
 
-    xapka.columns = ["date", "close", "xsrsi", "xwillrd", "xBBand", "OscSum","buy", "sell", "profit"]
+    xapka.columns = ["date", "close", "xsrsi", "xwillrd", "xBBand", "OscSum", "BBlevel","buy", "sell", "profit"]
     return xapka
     '''
     fig = plt.figure(num =1, figsize=(18,9))    #創建圖表
