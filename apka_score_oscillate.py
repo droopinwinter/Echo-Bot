@@ -22,20 +22,23 @@ def score_oscillate(data):
             else:
                 xsrsi = 0  
             #===========================================================================================
-            if data.at[j, 'willrd'] < -95 : 
+            if data.at[j, 'willrd'] < -90 : 
                 xwillrd = 1
-                if data.at[j, 'willrw'] <-95:
+                if data.at[j, 'willrw'] <-90:
                     xwillrd = 2
-            elif data.at[j, 'willrd'] > -5 :
+            elif data.at[j, 'willrd'] > -10 :
                 xwillrd = -1
-                if  data.at[j, 'willrw'] >-5:
+                if  data.at[j, 'willrw'] >-10:
                     xwillrd = -2
             else:
                 xwillrd = 0
             #===========================================================================================
             #"upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m"
             # (data.at[j, 'high'] - data.at[j, 'mid_d'])/(data.at[j, 'upp_d'] - data.at[j, 'mid_d']) > 0.9
-            LongShort = data.at[j, 'mid_d'] - data.at[j-1, 'mid_d']
+            Exup    = data.at[j, 'high'] - data.at[j, 'upp_d']
+            preExup =  data.at[j-1, 'high'] - data.at[j-1, 'upp_d']
+            ExDn    = data.at[j, 'low'] - data.at[j, 'low_d']
+            preExDn = data.at[j-1, 'low'] - data.at[j-1, 'low_d']
             BandWidth = (data.at[j, 'upp_d'] - data.at[j, 'low_d'])+1e-15
             level     = (data.at[j, 'close'] - data.at[j, 'low_d'])/BandWidth
 

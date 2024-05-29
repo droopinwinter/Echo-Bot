@@ -1,5 +1,5 @@
 DECLARE @CrTime Datetime
-SET @CrTime = '2024-05-28 17:29:45.120'--GETDATE()-0.009
+SET @CrTime = GETDATE()-0.002
 
 SELECT '+·¥ºÝ-¬Õ' TYP, count(*) cnt, SUM([profit]) Earn  FROM [trade].[dbo].[TradeRecord_SPY]
 WHERE LongShort between 10 and  11 and profit >0
@@ -54,4 +54,4 @@ WHERE LongShort between -10 and  -20 and profit <0
   and CreatDate >= @CrTime
 
   SELECT top 20 * FROM [trade].[dbo].[TradeRecord_SPY]
-  WHERE Ticker <> 'SPY ' and CreatDate >= @CrTime
+  WHERE Ticker like '%Total' and CreatDate >= @CrTime

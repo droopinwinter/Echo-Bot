@@ -9,7 +9,8 @@ def score_trend(data):
     for j in range(10,len(data)):
         try:      
             #利用EMA和MACD判斷長週期上升趨勢做多或空
-            if data.at[j, 'ema1'] > data.at[j, 'ema2'] and data.at[j, 'ema2'] >= data.at[j-1, 'ema2']:
+            EmaSlop =(data.at[j,"ema2"] - data.at[j-1,"ema2"]) + (data.at[j,"ema2"] - data.at[j-2,"ema2"])
+            if data.at[j, 'ema1'] > data.at[j, 'ema2'] and EmaSlop>0:
                 xema =1 
                 if data.at[j, 'ema2'] > data.at[j, 'ema3']:
                     xema =2
@@ -17,7 +18,7 @@ def score_trend(data):
                         xema =3
                         if data.at[j, 'ema4'] > data.at[j, 'ema5']:
                             xema =4
-            elif data.at[j, 'ema1'] < data.at[j, 'ema2'] and data.at[j, 'ema2'] <= data.at[j-1, 'ema2']:
+            elif data.at[j, 'ema1'] < data.at[j, 'ema2'] and EmaSlop<0:
                 xema =-1 
                 if data.at[j, 'ema2'] < data.at[j, 'ema3']:
                     xema =-2
