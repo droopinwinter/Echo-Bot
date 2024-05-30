@@ -10,7 +10,7 @@ def score_trend(data):
         try:      
             #利用EMA和MACD判斷長週期上升趨勢做多或空
             EmaSlop =(data.at[j,"ema2"] - data.at[j-1,"ema2"]) + (data.at[j,"ema2"] - data.at[j-2,"ema2"])
-            if data.at[j, 'ema1'] > data.at[j, 'ema2'] and EmaSlop>0:
+            if data.at[j, 'ema1'] > data.at[j, 'ema2']: #and EmaSlop>0:
                 xema =1 
                 if data.at[j, 'ema2'] > data.at[j, 'ema3']:
                     xema =2
@@ -18,7 +18,7 @@ def score_trend(data):
                         xema =3
                         if data.at[j, 'ema4'] > data.at[j, 'ema5']:
                             xema =4
-            elif data.at[j, 'ema1'] < data.at[j, 'ema2'] and EmaSlop<0:
+            elif data.at[j, 'ema1'] < data.at[j, 'ema2']: #and EmaSlop<0:
                 xema =-1 
                 if data.at[j, 'ema2'] < data.at[j, 'ema3']:
                     xema =-2
@@ -53,7 +53,7 @@ def score_trend(data):
                 xmacd =0
 
 
-            xstate =(data.at[j,"ema3"] - data.at[j-1,"ema3"]) + (data.at[j,"ema3"] - data.at[j-2,"ema3"])
+            xstate =(data.at[j,"ema2"] - data.at[j-3,"ema2"]) + (data.at[j,"ema3"] - data.at[j-3,"ema3"])
 
             a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, xstate, 0, 0, 0.0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
