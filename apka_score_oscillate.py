@@ -9,26 +9,51 @@ def score_oscillate(data):
     for j in range(10,len(data)):
         try:        
             #===========================================================================================
+            RsiSlop = (data.at[j,'fastk_d']- data.at[j-1,'fastk_d'])
+            wRsiSlop = (data.at[j,'fastk_w']- data.at[j-1,'fastk_w'])
+            '''
+            if data.at[j,'fastk_w'] > data.at[j,'fastd_w'] and data.at[j,'fastd_w'] < 20 and data.at[j,'fastk_w'] <20:
+                xsrsi = 1                
+                for k in range(j-10,j): 
+                    if  data.at[k, 'fastk_d'] < data.at[k, 'fastd_d'] and  data.at[k, 'fastd_d'] < 20:
+                        xsrsi = 2
+                        if wRsiSlop>0: 
+                            xsrsi = 3
+            elif data.at[j,'fastk_w'] < data.at[j,'fastd_w'] and data.at[j,'fastd_w'] > 80 and data.at[j,'fastk_w'] >80:
+                xsrsi = -1
+                for k in range(j-10,j): 
+                    if data.at[k, 'fastk_d'] > data.at[k, 'fastd_d'] and  data.at[k, 'fastd_d'] > 90:
+                        xsrsi = -2
+                        if wRsiSlop<0: 
+                            xsrsi = -3                        
+            else:
+                xsrsi = 0
+
+            '''
             if data.at[j, 'fastk_d'] > data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] < 20 :
                 xsrsi = 1
                 for k in range(j-10,j): 
-                    if  data.at[k, 'fastk_w'] < data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] < 20 :
+                    if  data.at[k, 'fastk_w'] < data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] < 20:
                         xsrsi = 2
-            elif data.at[j, 'fastk_d'] < data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] > 90 :
+            elif data.at[j, 'fastk_d'] < data.at[j, 'fastd_d'] and data.at[j, 'fastd_d'] > 90:
                 xsrsi = -1
                 for k in range(j-10,j): 
-                    if data.at[k, 'fastk_w'] > data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] > 90 :
+                    if data.at[k, 'fastk_w'] > data.at[k, 'fastd_w'] and  data.at[k, 'fastd_w'] > 90:
                         xsrsi = -2
             else:
-                xsrsi = 0  
+                xsrsi = 0
+
+            
             #===========================================================================================
-            if data.at[j, 'willrd'] < -90 : 
+            wSlop_d = (data.at[j,'willrd'] + data.at[j-1,'willrd'] + data.at[j-2,'willrd'] )/3
+            wSlop_w = data.at[j,'willrw'] - data.at[j-1,'willrw']
+            if data.at[j, 'willrd'] < -90 and wSlop_d <-90: 
                 xwillrd = 1
                 if data.at[j, 'willrw'] <-90:
                     xwillrd = 2
-            elif data.at[j, 'willrd'] > -10 :
+            elif data.at[j, 'willrd'] > -10  and wSlop_d >-10:
                 xwillrd = -1
-                if  data.at[j, 'willrw'] >-10:
+                if  data.at[j, 'willrw'] >-90:
                     xwillrd = -2
             else:
                 xwillrd = 0

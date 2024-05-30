@@ -24,7 +24,7 @@ for i in Ticker.Stock:
             "DELETE T FROM ("+\
             "	SELECT *, DupRank = ROW_NUMBER() OVER ("+\
             "	    PARTITION BY [date] ORDER BY (SELECT NULL)"+\
-            "	) FROM [Stock].[dbo]."+ i.strip()+'_AnalysDay '+\
+            "	) FROM [Stock].[dbo]."+'AnalysDay_'+ i.strip()+\
             ") AS T WHERE DupRank > 1"
  
         cursor.execute(sql4)
