@@ -22,11 +22,11 @@ def sqlCommand( xcode, kind):
             [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
             FROM [analsy].[dbo]."
     if   kind ==1:
-        sql = BaseSql +"[AnalysDay_"+xcode+"] Where date between '2021-05-03 00:00:00.000' and '2022-05-29 00:00:00.000' " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "
+        sql = BaseSql +"[AnalysDay_"+xcode+"] Where date between '2023-05-03 00:00:00.000' and '2024-05-29 00:00:00.000' " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "
     elif   kind ==2:
         sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '2021-05-28 00:00:00.000' " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "        
     elif kind ==3:
-        sql = BaseSql +"[AnalysHour_3_"+xcode+"] WHere date > '2024-02-03 00:00:00.000'" 
+        sql = BaseSql +"[AnalysHour3_"+xcode+"] WHere date > '2024-01-03 00:00:00.000'" #AnalysHour3_SPY
     else:
         sql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
                 [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
@@ -54,8 +54,9 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 
 TotTredRoc = pd.DataFrame()
 for xcode in Ticker.Stock:
-    sql3 = sqlCommand( xcode.strip() ,1)
-
+    #==========================================
+    sql3 = sqlCommand( xcode.strip() ,3)
+    #==========================================
     data = pd.read_sql(sql3, engine1, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
                     "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\

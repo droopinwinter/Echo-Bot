@@ -18,7 +18,8 @@ def TotProfit(xapka, Ticker):
         xTrnSlop  = xapka.at[i,"TrnSlop"]
         prebuy  = xapka.at[i-1,"buy"]
         if prebuy ==0:
-            if  ( (OscSum >=  6) or ( OscSum < 5 and xapka.at[i-1,"OscSum"] == 5 ) )and (xmacd <-2 or xema<-2) :
+            if  ( (OscSum >=  6) or ( OscSum < 5 and xapka.at[i-1,"OscSum"] == 5 )\
+                 or ( OscSum < 4 and xapka.at[i-1,"OscSum"] == 4 ) )and (xmacd <-2 or xema<-2) :
                 return 10 #+極端交易
             #elif ( OscSum < 4 and xapka.at[i-1,"OscSum"] == 4 ) and xmacd <=-1:
             #    return 11 #+極端交易

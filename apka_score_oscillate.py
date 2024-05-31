@@ -11,7 +11,7 @@ def score_oscillate(data):
             #===========================================================================================
             RsiSlop = (data.at[j,'fastk_d']- data.at[j-1,'fastk_d'])
             wRsiSlop = (data.at[j,'fastk_w']- data.at[j-1,'fastk_w'])
-            '''
+            
             if data.at[j,'fastk_w'] > data.at[j,'fastd_w'] and data.at[j,'fastd_w'] < 20 and data.at[j,'fastk_w'] <20:
                 xsrsi = 1                
                 for k in range(j-10,j): 
@@ -42,7 +42,7 @@ def score_oscillate(data):
                         xsrsi = -2
             else:
                 xsrsi = 0
-
+            '''
             
             #===========================================================================================
             wSlop_d = (data.at[j,'willrd'] + data.at[j-1,'willrd'] + data.at[j-2,'willrd'] )/3
@@ -51,12 +51,29 @@ def score_oscillate(data):
                 xwillrd = 1
                 if data.at[j, 'willrw'] <-90:
                     xwillrd = 2
+                    if data.at[j, 'willrd'] > data.at[j, 'willrw']:
+                        xwillrd = 3
             elif data.at[j, 'willrd'] > -10  and wSlop_d >-10:
                 xwillrd = -1
-                if  data.at[j, 'willrw'] >-90:
+                if  data.at[j, 'willrw'] >-10:
                     xwillrd = -2
+                    if data.at[j, 'willrd'] < data.at[j, 'willrw']:
+                        xwillrd = -3
             else:
                 xwillrd = 0
+            '''
+            if data.at[j, 'willrd'] < -90 and wSlop_d <-90: 
+                xwillrd = 1
+                if data.at[j, 'willrw'] <-90:
+                    xwillrd = 2
+            elif data.at[j, 'willrd'] > -10  and wSlop_d >-10:
+                xwillrd = -1
+                if  data.at[j, 'willrw'] >-10:
+                    xwillrd = -2
+            else:
+                xwillrd = 0            
+            '''
+
             #===========================================================================================
             #"upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m"
             # (data.at[j, 'high'] - data.at[j, 'mid_d'])/(data.at[j, 'upp_d'] - data.at[j, 'mid_d']) > 0.9
@@ -71,12 +88,16 @@ def score_oscillate(data):
             wlevel     = (data.at[j, 'close'] - data.at[j, 'low_w'])/wBandWidth
             if level >0.8: 
                 xBBand = -1
-                if wlevel >0.8:
-                     xBBand = -2
+                if Exup >0 :
+                    xBBand = -2 
+                    if wlevel >0.8:
+                        xBBand = -3
             elif level < 0.2:
                 xBBand = 1
-                if wlevel < 0.2:
+                if Exup <0:
                     xBBand = 2
+                    if wlevel < 0.2:
+                        xBBand = 3
             else:
                 xBBand = 0
             '''
