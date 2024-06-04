@@ -53,9 +53,9 @@ def score_trend(data):
                 xmacd =0
 
 
-            xstate =(data.at[j,"ema2"] - data.at[j-3,"ema2"]) + (data.at[j,"ema3"] - data.at[j-3,"ema3"])
+            TrnSlop =(data.at[j,"ema2"] - data.at[j-3,"ema2"]) + (data.at[j,"ema3"] - data.at[j-3,"ema3"])
 
-            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, xstate, 0, 0, 0.0]
+            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, TrnSlop, 0, 0, 0.0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   

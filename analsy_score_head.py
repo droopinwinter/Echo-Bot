@@ -45,7 +45,7 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select  top 6 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")   
@@ -55,7 +55,7 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 TotTredRoc = pd.DataFrame()
 for xcode in Ticker.Stock:
     #==========================================
-    sql3 = sqlCommand( xcode.strip() ,3)
+    sql3 = sqlCommand( xcode.strip() ,2)
     #==========================================
     data = pd.read_sql(sql3, engine1, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
@@ -106,4 +106,4 @@ for xcode in Ticker.Stock:
     #t = datetime.now()
     #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
     TotTredRoc.to_sql('TradeRecord_SPY',engine3,if_exists='append', index=False)
-    apka_score_ploy.plot(apkaCom, xcode.strip())
+    #apka_score_ploy.plot(apkaCom, xcode.strip())

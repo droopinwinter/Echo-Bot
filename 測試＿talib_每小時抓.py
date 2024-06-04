@@ -18,7 +18,7 @@ try:
     sql = 'select * FROM [Stock].[dbo].[TechAnalysisHour] '
     pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select top 6 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDate = datetime.now().strftime("%Y-%m-%d")   
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容

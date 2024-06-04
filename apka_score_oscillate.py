@@ -77,10 +77,11 @@ def score_oscillate(data):
             #===========================================================================================
             #"upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m"
             # (data.at[j, 'high'] - data.at[j, 'mid_d'])/(data.at[j, 'upp_d'] - data.at[j, 'mid_d']) > 0.9
-            Exup    = data.at[j, 'high'] - data.at[j, 'upp_d']
-            preExup =  data.at[j-1, 'high'] - data.at[j-1, 'upp_d']
-            ExDn    = data.at[j, 'low'] - data.at[j, 'low_d']
-            preExDn = data.at[j-1, 'low'] - data.at[j-1, 'low_d']
+            def Exup(k):
+                return data.at[j-k, 'high'] - data.at[j-k, 'upp_d']            
+            def ExDn(k):
+                return data.at[j-k, 'low'] - data.at[j-k, 'low_d']
+
             BandWidth = (data.at[j, 'upp_d'] - data.at[j, 'low_d'])+1e-15
             level     = (data.at[j, 'close'] - data.at[j, 'low_d'])/BandWidth
 
@@ -88,15 +89,15 @@ def score_oscillate(data):
             wlevel     = (data.at[j, 'close'] - data.at[j, 'low_w'])/wBandWidth
             if level >0.8: 
                 xBBand = -1
-                if Exup >0 :
-                    xBBand = -2 
-                    if wlevel >0.8:
-                        xBBand = -3
+                if wlevel >0.8:
+                    xBBand = -2                
+                    if Exup(0)>0 or Exup(1)>0 or Exup(2)>0 :
+                        xBBand = -3 
             elif level < 0.2:
                 xBBand = 1
-                if Exup <0:
+                if wlevel < 0.2:
                     xBBand = 2
-                    if wlevel < 0.2:
+                    if Exup(0) <0 or Exup(-1) <0 or Exup(2) <0:
                         xBBand = 3
             else:
                 xBBand = 0
