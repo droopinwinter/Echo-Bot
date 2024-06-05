@@ -2,7 +2,7 @@
 import pandas as pd
 
 
-def TotProfit(xapka, Ticker):
+def TotProfit(xapka, Ticker, CurrDateTime):
 
     def Xtred(i):
         xtred = 0
@@ -139,7 +139,7 @@ def TotProfit(xapka, Ticker):
             xapka.at[i,"buy"] =0
             xapka.at[i,"profit"] = (xapka.at[i,"close"] - buyPrice)/buyPrice
             #print(BuySellway +'Sell_'+str(xapka.at[i, "date"])[5:10]+'_profit= '+str( xapka.at[i,"profit"].round(3)))
-            a = [Ticker, xapka.at[i-1,"buy"], Buydate, xapka.at[i, "date"], round(buyPrice, 3), round(xapka.at[i,"close"], 3), round(xapka.at[i,"profit"],3)]
+            a = [Ticker, xapka.at[i-1,"buy"], Buydate, xapka.at[i, "date"], round(buyPrice, 3), round(xapka.at[i,"close"], 3), round(xapka.at[i,"profit"],3), CurrDateTime]
             TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
             BuySellway =''
         elif toSell <= -1 :
@@ -147,7 +147,7 @@ def TotProfit(xapka, Ticker):
             xapka.at[i,"buy"] =0
             xapka.at[i,"profit"] = (buyPrice - xapka.at[i,"close"])/buyPrice
             #print(BuySellway +'Sell_'+str(xapka.at[i, "date"])[5:10]+'_profit= '+str( xapka.at[i,"profit"].round(3)))
-            a = [Ticker, xapka.at[i-1,"buy"], Buydate, xapka.at[i, "date"], round(buyPrice, 3), round(xapka.at[i,"close"], 3), round(xapka.at[i,"profit"], 3)]
+            a = [Ticker, xapka.at[i-1,"buy"], Buydate, xapka.at[i, "date"], round(buyPrice, 3), round(xapka.at[i,"close"], 3), round(xapka.at[i,"profit"], 3), CurrDateTime]
             TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)            
             BuySellway =''
         else:
@@ -162,9 +162,9 @@ def TotProfit(xapka, Ticker):
             count = count +1
             total = total + total*xapka.at[i,"profit"]
     print( Ticker, "From [" + str(xapka.at[1,"date"]) +"] to ["+ str(xapka.at[len(xapka)-1,"date"]) +"] total =1000.0 after count: ["+str(count)+"] times total profit = "+str(round(total,3)) )
-    a = [Ticker+'_Total', 0, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3)]
+    a = [Ticker+'_Total', 0, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
     TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
-    TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
+    TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
     return TredRoc
     #TredRoc.to_csv('TredRocord_'+Ticker+'.csv')     
     

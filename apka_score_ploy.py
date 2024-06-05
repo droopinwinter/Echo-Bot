@@ -4,14 +4,16 @@ from datetime import datetime
 
 ColoLst =['black','sienna','red','orange','gold','green','blue','purple','grey','teal','black','sienna','red','orange','gold','green','blue','purple','grey','teal'] 
 
-def plot(xapka, xcode):
+def plot(xapka, xcode, CurrDateTime):
     #xapka.columns = ["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","sum", "xploy"]
     #print(xapka.head())
     #date       close  xema  xmacd  TrnSum  xsrsi  xwillrd  xBBand  OscSum  buy  sell  profit  EamCnt  EmaState  yema  xcmb
     fig = plt.figure(num =1, figsize=(18,9))    #創建圖表
     plt.subplot(2, 1, 1) # 添加子圖表1
     t = datetime.now()
-    StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
+    #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
+    StrTime = CurrDateTime.strftime("_%Y-%m-%d_%H_%M_%S")
+    
     plt.title('Ticker='+xcode+StrTime)
     plt.plot(xapka["date"],xapka["close"],  label=xcode , linewidth = 1, linestyle = '-'  ,color = 'blue')
     plt.plot(xapka["date"],xapka["close"] + 10*xapka["xmacd"],  label="xmacd"   , linewidth = 0.5, linestyle = '--',color = 'teal')  

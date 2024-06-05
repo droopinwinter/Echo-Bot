@@ -6,12 +6,14 @@ from pandas import DataFrame,Series
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import numpy as np
+
 import apka_score_ploy
 import apka_count_EMA
 import apka_score_trend
 import apka_score_oscillate
 import analsy_score_xcom
 import Trade
+import trad_record
 
 def sqlCommand( xcode, kind):
         #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000'
@@ -45,10 +47,12 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select  top 6 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
-    CurrDate = datetime.now().strftime("%Y-%m-%d")
+    CurrDateTime = datetime.now()
+    StrDate = CurrDateTime.strftime("%Y-%m-%d")
     StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")   
+    print('實驗日期-時間 : ' , CurrDateTime)
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
     print('連線SQL發生錯誤-' , errMsg)
 
@@ -98,12 +102,14 @@ for xcode in Ticker.Stock:
         print('回存apka資料庫錯誤_', i.strip() , errMsg)   
 
     '''
-    SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip())
+    SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime)
     #apkaCom.to_csv("apkaCom.csv")
     
     TotTredRoc = pd.concat([TotTredRoc, SingTredRoc], ignore_index=True)
     #TotTredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
     #t = datetime.now()
     #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
-    TotTredRoc.to_sql('TradeRecord_SPY',engine3,if_exists='append', index=False)
-    #apka_score_ploy.plot(apkaCom, xcode.strip())
+    trad_record.DoSummsry(TotTredRoc, CurrDateTime)
+    #TotTredRoc.to_sql('TradeRecord1',engine3,if_exists='append', index=False)
+    apka_score_ploy.plot(apkaCom, xcode.strip(),CurrDateTime)
+    #trad_record.DoSummsry()
