@@ -14,11 +14,11 @@ try:
     conn = pymssql.connect(host="192.9.12.226:1433", user='sa', password='abc123', database='Stock',charset='GBK')
     cursor = conn.cursor()    
     engine = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/Stock?charset=GBK")
-
+    engine1 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/analsy?charset=GBK")
     sql = 'select * FROM [Stock].[dbo].[TechAnalysis] '
     pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDate = datetime.now().strftime("%Y-%m-%d")   
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
@@ -26,7 +26,7 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 
 for i in Ticker.Stock:
     print(i)
-    sql3 = 'select * FROM [Stock].[dbo].[RowDay_'+i.strip()+'] '
+    sql3 = 'select distinct [Date],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowDay_'+i.strip()+'] order by date'
     #data = pd.read_sql(sql3, engine, index_col="Date", parse_dates=True)
     data = pd.read_sql(sql3, engine, parse_dates=True)
     data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
@@ -61,7 +61,7 @@ for i in Ticker.Stock:
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
                         "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]          
-        data.to_sql( i.strip()+'_AnalysDay',engine,if_exists='append', index=False)
+        data.to_sql( 'AnalysDay_'+i.strip(),engine1,if_exists='append', index=False)
         #data.drop("key_0", axis = 1)
         #del data['key_0']
         #data.to_csv("tech_idx.csv")

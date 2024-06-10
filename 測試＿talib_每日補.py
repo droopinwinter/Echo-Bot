@@ -34,7 +34,7 @@ try:
 
             sql3 = 'select top 1000 Date FROM [Stock].[dbo].[RowDay_'+i.strip()+'] order by date desc'
             SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select * FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000'"
+            sql3 = "select distinct [Date],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000' order by date "
             data = pd.read_sql(sql3, engine, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
@@ -75,7 +75,7 @@ try:
 
             sql3 = 'select top 1000 Datetime Date FROM [Stock].[dbo].[RowHour_'+i.strip()+'] order by date desc'
             SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select * FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000'"
+            sql3 = "select distinct [Datetime],[Open],[High],[Low],[Close],[Adj Close],[Volume] FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000' order by Datetime "
             data = pd.read_sql(sql3, engine, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
