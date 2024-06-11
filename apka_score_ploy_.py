@@ -22,7 +22,7 @@ def plot(xapka, xcode):
     sub2.plot(xapka["date"],xapka["xema"],   label="xema"    , linewidth = 0.5, linestyle = '-' ,color = 'red') 
     sub2.plot(xapka["date"],xapka["xmacd"],  label="xmacd"   , linewidth = 0.5, linestyle = '--',color = 'teal')
     sub2.plot(xapka["date"],xapka["yema"],  label="yema"   , linewidth = 0.5, linestyle = '--',color = 'sienna')
-    #sub2.plot(xapka["date"],xapka["xcmb"],  label="xcmb"   , linewidth = 2, linestyle = '--',color = 'orange')  
+    #sub2.plot(xapka["date"],xapka["BBlevel"]*6,  label="BBlevel"   , linewidth = 1, linestyle = '--',color = 'orange')  
     #sub2.plot(xapka["date"],xapka["xsrsi"],  label="xsrsi"   , linewidth = 1,linestyle = '-',color = 'brown') 
     #sub2.plot(xapka["date"],xapka["xwillrd"],label="xwillrd" , linewidth = 1,linestyle = '--',color = 'black')  
     sub2.plot(xapka["date"],xapka["OscSum"] ,label="OscSum"  , linewidth = 1,linestyle = '-.',color = 'indigo') 

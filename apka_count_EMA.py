@@ -83,7 +83,7 @@ def score_EMA( data ):
                     "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
                     "Cntema12","Cntema23", "Cntema34", "Cntema45", "Cntema56","Cntema67", "Cntema78", "Cntema89", "Cntema9A"]
     
-    #plot_EMA( CntEma )
+    plot_EMA( CntEma )
     CntEma =CntEma.drop(columns=[ "close","high","low","ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"])
     #CntEma.to_csv("test_apka_count_EMA.csv")
     TredEma = pd.DataFrame()

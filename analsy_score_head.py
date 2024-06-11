@@ -15,10 +15,9 @@ import analsy_score_xcom
 import Trade
 import trad_record
 
-def sqlCommand( xcode, kind):
+def sqlCommand( xcode, kind, Bef1YerDate):
         #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000'
     # > '2021-05-03 00:00:00.000'
-
     BaseSql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
             [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
             [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
@@ -29,6 +28,8 @@ def sqlCommand( xcode, kind):
         sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '2021-05-28 00:00:00.000' " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "        
     elif kind ==3:
         sql = BaseSql +"[AnalysHour3_"+xcode+"] WHere date > '2024-01-03 00:00:00.000'" #AnalysHour3_SPY
+    elif kind ==4:#Bef1YerDate.strftime("%Y-%m-%d, %H:%M:%S")
+        sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '"+Bef1YerDate.strftime("%Y-%m-%d %H:%M:%S") +"'" #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "        
     else:
         sql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
                 [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
@@ -51,7 +52,9 @@ try:
     Ticker = pd.read_sql(sql2, engine)
     CurrDateTime = datetime.now()
     StrDate = CurrDateTime.strftime("%Y-%m-%d")
-    StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")   
+    StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")
+    Bef1YerDate = CurrDateTime  - timedelta(days=365)
+
     print('實驗日期-時間 : ' , CurrDateTime)
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
     print('連線SQL發生錯誤-' , errMsg)
@@ -59,7 +62,7 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 TotTredRoc = pd.DataFrame()
 for xcode in Ticker.Stock:
     #==========================================
-    sql3 = sqlCommand( xcode.strip() ,2)
+    sql3 = sqlCommand( xcode.strip() ,4, Bef1YerDate)
     #==========================================
     data = pd.read_sql(sql3, engine1, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
