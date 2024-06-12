@@ -53,7 +53,9 @@ def plot_EMA( CntEma ):
     #plt.xlabel("價位")\plt.ylabel("日期")
     plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
     plt.legend() 
-    plt.show()  
+    plt.savefig('..\\PlotImg\\'+'apka_count_EMA.png')  
+    plt.show()
+    
 
 def score_EMA( data ):
     #print('apka_score_EMA')
@@ -83,16 +85,21 @@ def score_EMA( data ):
                     "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
                     "Cntema12","Cntema23", "Cntema34", "Cntema45", "Cntema56","Cntema67", "Cntema78", "Cntema89", "Cntema9A"]
     
-    plot_EMA( CntEma )
+    #plot_EMA( CntEma )
+    
     CntEma =CntEma.drop(columns=[ "close","high","low","ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"])
-    #CntEma.to_csv("test_apka_count_EMA.csv")
+    CntEma.to_csv("test_apka_count_EMA.csv")
     TredEma = pd.DataFrame()
-    yema     = 0
-    for i in range(10,len(CntEma)):
+
+    yema = 0            
+    for i in range(3,10):
+        if CntEma.iat[5,i] > 0 :    
+            yema = i-2    
+    for i in range(5,len(CntEma)):
         try:
             EmaState =0
             EamCnt   =0
-            #yema     = 0
+            #yema     =0 
             for j in range(3,10):
                 if CntEma.iat[i,j] > EmaState :
                     EamCnt =j
@@ -102,12 +109,14 @@ def score_EMA( data ):
                     yema += 1
                 elif rzt <0:
                     yema -= 1
+                else:
+                    yema = yema
             a = [ CntEma.at[i,'date'], EamCnt, EmaState, yema ]
             TredEma = pd.concat([TredEma, pd.DataFrame([a])], ignore_index=True)            
         except Exception as errMsg: 
             print('每K線EMA錯誤-', str(data.at[j,'date']) , errMsg)
     TredEma.columns = ["date", "EamCnt","EmaState","yema"]                    
-    #TredEma.to_csv("test1_apka_count_EMA.csv")    
+    TredEma.to_csv("test1_apka_count_EMA.csv")    
     return TredEma
 
 
