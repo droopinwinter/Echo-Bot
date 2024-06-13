@@ -12,12 +12,12 @@ def EmaStateMaChing( ema1, ema2, high, low, PreSt):
         if PreSt%2 ==1 and low > ema2 and low < ema1:
             PreSt = PreSt+1
     elif ema1 < ema2: 
-        if PreSt<=-2 and high > ema2:
+        if PreSt>=2 and high > ema2:
             PreSt = 0
         if PreSt%2 ==0 and high < ema1 :
-            PreSt = PreSt-1
-        if PreSt%2 ==-1 and high > ema1 and high < ema2:
-            PreSt = PreSt-1
+            PreSt = PreSt+1
+        if PreSt%2 ==1 and high > ema1 and high < ema2:
+            PreSt = PreSt+1
     return PreSt
 
 def PutOrCall( NowWaveSt, PreWaveSt):
@@ -25,10 +25,6 @@ def PutOrCall( NowWaveSt, PreWaveSt):
         return 1
     elif (NowWaveSt == 0 and PreWaveSt >=2) :            
         return -1
-    elif (NowWaveSt == -1 and PreWaveSt ==0) :            
-        return -1    
-    elif (NowWaveSt == 0 and PreWaveSt <=-2) :            
-        return 1        
     else:
         return 0
 
@@ -92,14 +88,10 @@ def score_EMA( data ):
     #plot_EMA( CntEma )
     
     CntEma =CntEma.drop(columns=[ "close","high","low","ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"])
-    CntEma.to_csv("CntEma_apka_count_EMA.csv")
+    CntEma.to_csv("test_apka_count_EMA.csv")
     TredEma = pd.DataFrame()
-
-    yema = 0            
-    for i in range(3,10):
-        if CntEma.iat[5,i] > 0 :    
-            yema = i-2    
-    for i in range(5,len(CntEma)):
+    yema     = 0
+    for i in range(10,len(CntEma)):
         try:
             EmaState =0
             EamCnt   =0
@@ -108,19 +100,19 @@ def score_EMA( data ):
                 if CntEma.iat[i,j] > EmaState :
                     EamCnt =j
                     EmaState = CntEma.iat[i,j]
-                rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
-                if rzt >0:                    
-                    yema += 1
-                elif rzt <0:
-                    yema -= 1
-                else:
-                    yema = yema
+            rzt = PutOrCall(EmaState, CntEma.iat[i-1,EamCnt])
+            if rzt >0:
+                yema += 1
+            elif rzt <0:
+                yema -= 1
+            else:
+                yema = yema
             a = [ CntEma.at[i,'date'], EamCnt, EmaState, yema ]
             TredEma = pd.concat([TredEma, pd.DataFrame([a])], ignore_index=True)            
         except Exception as errMsg: 
             print('每K線EMA錯誤-', str(data.at[j,'date']) , errMsg)
     TredEma.columns = ["date", "EamCnt","EmaState","yema"]                    
-    TredEma.to_csv("TredEma_apka_count_EMA.csv")    
+    TredEma.to_csv("test1_apka_count_EMA.csv")    
     return TredEma
 
 

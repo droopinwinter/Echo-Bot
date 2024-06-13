@@ -48,7 +48,7 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select top 6 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDateTime = datetime.now()
     StrDate = CurrDateTime.strftime("%Y-%m-%d")
@@ -112,7 +112,7 @@ for xcode in Ticker.Stock:
     #TotTredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
     #t = datetime.now()
     #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
-    trad_record.DoSummsry(TotTredRoc, CurrDateTime)
+    #trad_record.DoSummsry(TotTredRoc, CurrDateTime)
     #TotTredRoc.to_sql('TradeRecord1',engine3,if_exists='append', index=False)
     apka_score_ploy.plot(apkaCom, xcode.strip(),CurrDateTime)
     #trad_record.DoSummsry()
