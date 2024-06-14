@@ -116,7 +116,7 @@ def score_oscillate(data):
             '''
             sum= xBBand+xsrsi+xwillrd    
             #===========================================================================================
-            a=[ data.at[j,'date'],data.at[j,'close'], xsrsi, xwillrd,xBBand, sum, level, 0, 0, 0.0]
+            a=[ data.at[j,'date'],data.at[j,'close'], xsrsi, xwillrd,xBBand, sum, level.round(3), 0, 0, 0.0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   

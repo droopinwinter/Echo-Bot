@@ -33,7 +33,7 @@ def score_trend(data):
             #xema = apka_score_index.score_ema(data.iloc[j-10:j,:])
             MacdSlop =(data.at[j,"signal_d"] - data.at[j-1,"signal_d"]) + (data.at[j,"signal_d"] - data.at[j-2,"signal_d"])
             
-            if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d'] and MacdSlop>0:#data.at[j, 'signal_d'] >= data.at[j-1, 'signal_d']:
+            if  data.at[j, 'MACD_d'] > data.at[j, 'signal_d'] and MacdSlop>0 and data.at[j, 'signal_d'] > 0:
                 xmacd =1
                 if data.at[j, 'MACD_d'] > 0:
                     xmacd =2
@@ -41,7 +41,7 @@ def score_trend(data):
                         xmacd =3 
                         if data.at[j, 'MACD_w'] > 0:
                             xmacd =4                       
-            elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] and MacdSlop<0:#data.at[j, 'signal_d'] <= data.at[j-1, 'signal_d']:
+            elif data.at[j, 'MACD_d'] < data.at[j, 'signal_d'] and MacdSlop<0 and data.at[j, 'signal_d'] < 0:
                 xmacd =-1
                 if data.at[j, 'MACD_d'] < 0:
                     xmacd =-2
@@ -55,7 +55,7 @@ def score_trend(data):
 
             TrnSlop =(data.at[j,"ema2"] - data.at[j-3,"ema2"]) + (data.at[j,"ema3"] - data.at[j-3,"ema3"])
 
-            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, TrnSlop, 0, 0, 0.0, 0 , 0]
+            a=[ data.at[j,'date'],data.at[j,'close'], xema, xmacd, TrnSlop.round(3), 0, 0, 0.0, 0 , 0]
             xapka = pd.concat([xapka, pd.DataFrame([a])], ignore_index=True)                
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   

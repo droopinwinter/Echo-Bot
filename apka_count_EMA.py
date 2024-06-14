@@ -19,8 +19,22 @@ def EmaStateMaChing( ema1, ema2, high, low, PreSt):
         if PreSt%2 ==-1 and high > ema1 and high < ema2:
             PreSt = PreSt-1
     return PreSt
-
+'''
 def PutOrCall( NowWaveSt, PreWaveSt):
+    if NowWaveSt == 1 and PreWaveSt ==0:
+        return 1
+    elif (NowWaveSt == 0 and PreWaveSt >=2) :            
+        return -1
+    elif (NowWaveSt == -1 and PreWaveSt ==0) :            
+        return -1    
+    elif (NowWaveSt == 0 and PreWaveSt <=-2) :            
+        return 1        
+    else:
+        return 0
+'''
+def PutOrCall( CntEma, xj):
+    PreWaveSt = CntEma.iat[0,xj]
+    NowWaveSt = CntEma.iat[1,xj]
     if NowWaveSt == 1 and PreWaveSt ==0:
         return 1
     elif (NowWaveSt == 0 and PreWaveSt >=2) :            
@@ -39,8 +53,9 @@ def plot_EMA( CntEma ):
     for i in range(10,len(CntEma)):
         xdate = CntEma.at[i, "date"]
         yclose = CntEma.at[i, "close"]
-        for j in range(16,22):
-            rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
+        for j in range(16,25):
+            #rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
+            rzt = PutOrCall(CntEma.iloc[[i-1, i],[0,1,2,3,4,5,6,7,8,9]], j-15) 
             if rzt >0:
                 plt.text(xdate, yclose-5, str(j-13)+'_' +str(xdate)[5:10],rotation=90,color=color_list[j-16])
             if rzt <0:
@@ -108,7 +123,8 @@ def score_EMA( data ):
                 if CntEma.iat[i,j] > EmaState :
                     EamCnt =j
                     EmaState = CntEma.iat[i,j]
-                rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
+                #rzt = PutOrCall(CntEma.iat[i,j], CntEma.iat[i-1,j])
+                rzt = PutOrCall(CntEma.iloc[[i-1, i],[0,1,2,3,4,5,6,7,8,9]], j) 
                 if rzt >0:                    
                     yema += 1
                 elif rzt <0:
