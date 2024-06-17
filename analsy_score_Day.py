@@ -50,7 +50,7 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 6 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select top1 * FROM [Stock].[dbo].[Ticker] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDateTime = datetime.now()
     StrDate = CurrDateTime.strftime("%Y-%m-%d")
@@ -105,17 +105,16 @@ for xcode in Ticker.Stock:
     cmb = analsy_score_xcom.score_xcom(apkaCom)
     apkaCom = pd.merge( apkaCom, cmb)    
     
-
-    
+    SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime)
     try:
         engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
-        apkaCom.reset_index(drop=True)      
-        apkaCom.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
+        SingTredRoc.reset_index(drop=True)      
+        SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         print('回存apka資料庫錯誤_', xcode.strip() , errMsg)   
 
     
-    #SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime)
+
     #apkaCom.to_csv("apkaCom.csv")
     
     #TotTredRoc = pd.concat([TotTredRoc, SingTredRoc], ignore_index=True)

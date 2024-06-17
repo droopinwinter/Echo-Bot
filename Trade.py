@@ -2,7 +2,7 @@
 import pandas as pd
 
 
-def TotProfit(xapka, Ticker, CurrDateTime):
+def TotProfit(xapka, Ticker, CurrDateTime, rzt):
 
     def Xtred(i):
         xtred = 0
@@ -177,6 +177,10 @@ def TotProfit(xapka, Ticker, CurrDateTime):
     a = [Ticker+'_Total', 0, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
     TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
     TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
-    return TredRoc
+
+    if rzt == 1:
+        return xapka
+    else:
+        return TredRoc
     #TredRoc.to_csv('TredRocord_'+Ticker+'.csv')     
     
