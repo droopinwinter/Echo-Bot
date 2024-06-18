@@ -107,7 +107,7 @@ def score_EMA( data ):
     #plot_EMA( CntEma )
     
     CntEma =CntEma.drop(columns=[ "close","high","low","ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"])
-    CntEma.to_csv("CntEma_apka_count_EMA.csv")
+    #CntEma.to_csv("CntEma_apka_count_EMA.csv")
     TredEma = pd.DataFrame()
 
     yema = 0            
@@ -136,7 +136,7 @@ def score_EMA( data ):
         except Exception as errMsg: 
             print('每K線EMA錯誤-', str(data.at[j,'date']) , errMsg)
     TredEma.columns = ["date", "EamCnt","EmaState","yema"]                    
-    TredEma.to_csv("TredEma_apka_count_EMA.csv")    
+    #TredEma.to_csv("TredEma_apka_count_EMA.csv")    
     return TredEma
 
 

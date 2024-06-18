@@ -19,7 +19,7 @@ try:
     sql = 'select * FROM [Stock].[dbo].[TechAnalysis] '
     pd_TechAnalysis = pd.read_sql(sql, engine)
     
-    sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     pd_read_sql = pd.read_sql(sql2, engine)
     for i in pd_read_sql.Stock:
@@ -53,13 +53,13 @@ try:
             try:          
                 data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data1.reset_index(drop=True)
-                data.columns = ["date","open","high","low","close","adjclose","colume",\
+                data1.columns = ["date","open","high","low","close","adjclose","colume",\
                         "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
                         "willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
                         "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
-                data.to_sql( 'AnalysDay_'+i.strip(),engine1,if_exists='append', index=False)
+                data1.to_sql( 'AnalysDay_'+i.strip(),engine1,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', i.strip() , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
@@ -94,13 +94,13 @@ try:
             try:          
                 data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data1.reset_index(drop=True)
-                data.columns = ["date","open","high","low","close","adjclose","colume",\
+                data1.columns = ["date","open","high","low","close","adjclose","colume",\
                         "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
                         "willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
                         "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
-                data.to_sql( 'AnalysHour_'+i.strip(),engine1,if_exists='append', index=False)
+                data1.to_sql( 'AnalysHour_'+i.strip(),engine1,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', i.strip() , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容

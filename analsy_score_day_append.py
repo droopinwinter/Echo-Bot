@@ -50,7 +50,7 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select * FROM [Stock].[dbo].[Ticker_apk] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDateTime = datetime.now()
     StrDate = CurrDateTime.strftime("%Y-%m-%d")
@@ -110,8 +110,8 @@ for xcode in Ticker.Stock:
     try:
         engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
         SingTredRoc.reset_index(drop=True)      
-        #SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
-        print(SingTredRoc)
+        SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
+        #print(SingTredRoc)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         print('回存apka資料庫錯誤_', xcode.strip() , errMsg)   
 

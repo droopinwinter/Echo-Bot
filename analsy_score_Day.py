@@ -50,7 +50,7 @@ try:
     #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
     #pd_TechAnalysis = pd.read_sql(sql, engine)
 
-    sql2 = 'select top1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select * FROM [Stock].[dbo].[Ticker_apk] '
     Ticker = pd.read_sql(sql2, engine)
     CurrDateTime = datetime.now()
     StrDate = CurrDateTime.strftime("%Y-%m-%d")
@@ -105,7 +105,7 @@ for xcode in Ticker.Stock:
     cmb = analsy_score_xcom.score_xcom(apkaCom)
     apkaCom = pd.merge( apkaCom, cmb)    
     
-    SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime)
+    SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime, 1)
     try:
         engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
         SingTredRoc.reset_index(drop=True)      
