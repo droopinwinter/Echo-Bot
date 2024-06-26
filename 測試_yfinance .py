@@ -19,11 +19,11 @@ stk_list = [
 ]
 
 stk_list1 = [
- '^SPX','^IXIC','^DJI','^RUT'
+ 'DX-Y.NYB',
 ]
 # 先測試一檔試看看
-stock = yf.Ticker('^IXIC')
-yf.download('^SPX',period='1mo',interval='90m').to_csv('Hprice_IXIC.csv')
+stock = yf.Ticker('DX-Y.NYB')
+yf.download('DX-Y.NYB',period='1mo',interval='90m').to_csv('Hprice_IXIC.csv')
 # 取得價量資料＋股利發放資料＋股票分割資料
 '''
 stock.history(period = 'max')

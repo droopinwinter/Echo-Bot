@@ -62,6 +62,7 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
     print('連線SQL發生錯誤-' , errMsg)
 
 TotTredRoc = pd.DataFrame()
+cnt =1
 for xcode in Ticker.Stock:
     print('Stock_'+xcode.strip())
     
@@ -111,6 +112,9 @@ for xcode in Ticker.Stock:
         engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
         SingTredRoc.reset_index(drop=True)      
         SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
+        SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt)+'_'+ xcode.strip()
+        cnt = cnt+1
+        SingTredRoc.to_sql( 'ApkaDay_Combin',engine2,if_exists='append', index=False)
         #print(SingTredRoc)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         print('回存apka資料庫錯誤_', xcode.strip() , errMsg)   
