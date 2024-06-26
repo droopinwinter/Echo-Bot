@@ -19,7 +19,7 @@ try:
     sql = 'select * FROM [Stock].[dbo].[TechAnalysis] '
     pd_TechAnalysis = pd.read_sql(sql, engine)
     
-    sql2 = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
+    sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     pd_read_sql = pd.read_sql(sql2, engine)
     for i in pd_read_sql.Stock:

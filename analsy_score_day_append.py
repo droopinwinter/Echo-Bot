@@ -112,7 +112,7 @@ for xcode in Ticker.Stock:
         engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
         SingTredRoc.reset_index(drop=True)      
         SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
-        SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt)+'_'+ xcode.strip()
+        SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt).zfill(2)+'_'+ xcode.strip()
         cnt = cnt+1
         SingTredRoc.to_sql( 'ApkaDay_Combin',engine2,if_exists='append', index=False)
         #print(SingTredRoc)
