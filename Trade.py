@@ -26,7 +26,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt):
             #    return 11 #+極端交易
             #elif OscSum <= -6 and xmacd >=4 and xema >=4 and xTrnSlop<=0:
             #    return -11            
-            elif  yema > xapka.at[i-1,"yema"]  and yema >0 and xTrnSlop>0:
+            elif  yema > xapka.at[i-1,"yema"]  and yema >0 :#and xTrnSlop>0
                 xapka.at[i,"buySig"] =yema
                 return yema  #+GMMA交易                        
             #elif yema < xapka.at[i-1,"yema"] and yema <=-1 and xema <0 and xTrnSlop<=0:
