@@ -9,9 +9,9 @@ from datetime import timedelta
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
-    conn = pymssql.connect(host="192.168.244.8:1433", user='sa', password='abc123', database='Stock',charset='GBK')
+    conn = pymssql.connect(host="127.0.0.1:1433", user='sa', password='abc123', database='Stock',charset='GBK')
     cursor = conn.cursor()    
-    engine = create_engine("mssql+pymssql://sa:abc123@192.168.244.8:1433/Stock?charset=GBK")
+    engine = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/Stock?charset=GBK")
 
     sql2 = "select * FROM [Stock].[dbo].[Ticker] WHERE STOCK = 'SPXL' "
     CurrDate = datetime.now().strftime("%Y-%m-%d")
