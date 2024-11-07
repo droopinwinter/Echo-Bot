@@ -6,42 +6,32 @@ import pandas as pd
 from pandas import DataFrame,Series
 from datetime import datetime
 from datetime import timedelta
+import conn_db
+import collect_sql_cmd
 
 try:
-    # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
-    conn = pymssql.connect(host="127.0.0.1:1433", user='sa', password='abc123', database='Stock',charset='GBK')
-    cursor = conn.cursor()    
-    engine = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/Stock?charset=GBK")
-
-    sql2 = "select * FROM [Stock].[dbo].[Ticker] WHERE STOCK = 'SPXL' "
     CurrDate = datetime.now().strftime("%Y-%m-%d")
-    pd_read_sql = pd.read_sql(sql2, engine)
+    pd_read_sql = pd.read_sql(collect_sql_cmd.s_Stock_Ticker, conn_db.eng_Stock)
     for i in pd_read_sql.Stock:
         print('Stock_'+i)
         #yf.download(i,period='2y',interval='1h').to_csv('RowHr_'+i.strip()+'.csv')#to_sql( 'RowDay_'+i.strip(),engine,if_exists='append', index=True)
-        #小時K
-        sql3 = 'select top 1 max(Datetime) Date FROM [Stock].[dbo].[RowHour_'+i.strip()+'] '
-        SqlMaxDate = pd.read_sql(sql3, engine).iat[0, 0].strftime("%Y-%m-%d")
-        sql4 = "DELETE [Stock].[dbo].[RowHour_"+i.strip()+"] Where Datetime >= '"+SqlMaxDate+" 00:00:00.000'"
-        cursor.execute(sql4)
-        conn.commit()
-        #rzt = yf.download(i,start = SqlMaxDate.iat[0, 0].strftime("%Y-%m-%d"), end=CurrDate.strftime("%Y-%m-%d"),interval='1h')
-        #print(rzt)
-        yf.download(i,start = SqlMaxDate, end=CurrDate,interval='1h').to_sql( 'RowHour_'+i.strip(),engine,if_exists='append', index=True)
+        #小時K        
+        SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastHour(i), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        conn_db.cur_Stock.execute( collect_sql_cmd.DelDupHour(i, SqlMaxDate) )
+        conn_db.con_Stock.commit()
+        yf.download(i,start = SqlMaxDate, end=CurrDate,interval='1h').to_sql( 'RowHour_'+i.strip(),conn_db.eng_Stock,if_exists='append', index=True)
+
         #日K
-        sql3 = 'select top 1 max(Date) Date FROM [Stock].[dbo].[RowDay_'+i.strip()+'] '
-        SqlMaxDate = pd.read_sql(sql3, engine).iat[0, 0].strftime("%Y-%m-%d")
-        sql4 = "DELETE [Stock].[dbo].[RowDay_"+i.strip()+"] Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
-        cursor.execute(sql4)
-        conn.commit()
-        yf.download(i,start = SqlMaxDate, end=CurrDate,interval='1d').to_sql( 'RowDay_'+i.strip(),engine,if_exists='append', index=True)        
+        SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastDay(i), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        conn_db.cur_Stock.execute( collect_sql_cmd.DelDupDay(i, SqlMaxDate) )
+        conn_db.con_Stock.commit()
+        yf.download(i,start = SqlMaxDate, end=CurrDate,interval='1d').to_sql( 'RowDay_'+i.strip(),conn_db.eng_Stock,if_exists='append', index=True)        
         #週K
-        sql3 = 'select top 1 max(Date) Date FROM [Stock].[dbo].[RowWeek_'+i.strip()+'] '
-        SqlMaxDate = pd.read_sql(sql3, engine).iat[0, 0].strftime("%Y-%m-%d")
-        sql4 = "DELETE [Stock].[dbo].[RowWeek_"+i.strip()+"] Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
-        cursor.execute(sql4)
-        conn.commit()
-        yf.download(i,start = SqlMaxDate, end=CurrDate,interval='1wk').to_sql( 'RowWeek_'+i.strip(),engine,if_exists='append', index=True)        
+        
+        SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastWeek(i), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        conn_db.cur_Stock.execute( collect_sql_cmd.DelDupWeek(i, SqlMaxDate) )
+        conn_db.con_Stock.commit()
+        yf.download(i,start = SqlMaxDate, end=CurrDate,interval='1wk').to_sql( 'RowWeek_'+i.strip(),conn_db.eng_Stock,if_exists='append', index=True)        
 
         '''
         #初始下載歷史資料

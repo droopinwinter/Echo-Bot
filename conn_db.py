@@ -5,10 +5,5 @@ import pymssql
 con_Stock = pymssql.connect(host="127.0.0.1:1433", user='sa', password='abc123', database='Stock',charset='GBK')
 cur_Stock = con_Stock.cursor()
 
-s_Stock_Ticker  = 'select * FROM [Stock].[dbo].[Ticker] '
-s_Stock_RowHour = 'select top 1 max(Datetime) Date FROM [Stock].[dbo].[RowHour_'
-s_Stock_RowDay  = 'select top 1 max(Date) Date FROM [Stock].[dbo].[RowDay_'
-s_Stock_RowWeek = 'select top 1 max(Date) Date FROM [Stock].[dbo].[RowWeek_'
-
 eng_Stock  = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/Stock?charset=GBK")
 eng_analsy = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/analsy?charset=GBK")
