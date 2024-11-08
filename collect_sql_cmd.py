@@ -1,4 +1,5 @@
 #collect_sql_cmd
+#s_Stock_Ticker  = 'select top 1 * FROM [Stock].[dbo].[Ticker] '
 s_Stock_Ticker  = 'select * FROM [Stock].[dbo].[Ticker] '
 #xTicker = ''
 #SqlMaxDate =''
@@ -10,20 +11,19 @@ s_Stock_Ticker  = 'select * FROM [Stock].[dbo].[Ticker] '
 #d_Stock_RowWeek = ''
 
 def SLastHour( xTicker):
-    return "select top 1 max(Datetime) Date FROM [Stock].[dbo].[RowHour_%s]" % (xTicker)
+    return f"select top 1 max(Datetime) Date FROM [Stock].[dbo].[RowHour_{xTicker}]"
 
 def SLastDay( xTicker):
-    return 'select top 1 max(Date)     Date FROM [Stock].[dbo].[RowDay_%s]'  % (xTicker) 
+    return f'select top 1 max(Date) Date FROM [Stock].[dbo].[RowDay_{xTicker}]'
 
 def SLastWeek( xTicker):
-    return 'select top 1 max(Date)     Date FROM [Stock].[dbo].[RowWeek_%s]' % (xTicker)
-
+    return f'select top 1 max(Date) Date FROM [Stock].[dbo].[RowWeek_{xTicker}]'
 
 def DelDupHour( xTicker, SqlMaxDate):
-    return "DELETE [Stock].[dbo].[RowHour_%s] Where Datetime >= '%s 00:00:00.000'"  % (xTicker,SqlMaxDate)
+    return f"DELETE [Stock].[dbo].[RowHour_{xTicker}] Where Datetime >= '{SqlMaxDate} 00:00:00.000'"
 
 def DelDupDay( xTicker, SqlMaxDate):
-    return "DELETE [Stock].[dbo].[RowDay_%s] Where Date >= '%s 00:00:00.000'"  % (xTicker,SqlMaxDate)
+    return f"DELETE [Stock].[dbo].[RowDay_{xTicker}] Where Date >= '{SqlMaxDate} 00:00:00.000'"
 
 def DelDupWeek( xTicker, SqlMaxDate):
-    return "DELETE [Stock].[dbo].[RowWeek_%s] Where Date >= '%s 00:00:00.000'"  % (xTicker,SqlMaxDate)
+    return f"DELETE [Stock].[dbo].[RowWeek_{xTicker}] Where Date >= '{SqlMaxDate} 00:00:00.000'"
