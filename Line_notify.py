@@ -51,6 +51,13 @@ def lineNotify(msg):
 def read_sql(SqlStr, engine):
     Ticker = pd.read_sql(SqlStr, engine)
     Ticker =Ticker.drop(columns=["date"])
+    '''
+    for col in Ticker.columns:
+      if int(col) < len(Ticker.columns):
+         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 3), side='right')
+      else:
+         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 5), side='right')    
+    '''     
     StrDate = Ticker.to_string()
     if len(Ticker) == 0 :
        return ''

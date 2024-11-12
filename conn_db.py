@@ -7,3 +7,5 @@ cur_Stock = con_Stock.cursor()
 
 eng_Stock  = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/Stock?charset=GBK")
 eng_analsy = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/analsy?charset=GBK")
+eng_apka   = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/apka?charset=GBK")
+eng_trade  = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/trade?charset=GBK")  
