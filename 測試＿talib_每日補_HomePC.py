@@ -8,6 +8,18 @@ from datetime import datetime
 from datetime import timedelta
 import talib
 from talib import abstract
+import conn_db
+import talib_sql_cmd
+
+
+def ClearAnalys( xTicker1, eng_analsy, talib_sql_cmd):
+    SqlMaxDate = pd.read_sql(talib_sql_cmd.SLastHour( xTicker1), eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+    cursor.execute(talib_sql_cmd.DelDupHour( xTicker1, SqlMaxDate) )
+    conn.commit()
+
+    SqlMaxDate = pd.read_sql(talib_sql_cmd.SLastDay( xTicker1), eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+    cursor.execute(talib_sql_cmd.DelDupDay( xTicker1, SqlMaxDate) )
+    conn.commit()
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
