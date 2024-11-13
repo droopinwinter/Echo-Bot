@@ -8,8 +8,12 @@ def SLastHour( xTicker):
 def SLastDay( xTicker):
     return f'select max(Date) Date FROM [analsy].[dbo].AnalysDay_{xTicker}'    
 
-def S1000Hour( xTicker):
+def S1000StockHour( xTicker):
     return f'select top 1000 Datetime Date FROM [Stock].[dbo].[RowHour_{xTicker}] order by date desc'
+
+def S1000StockDay( xTicker):
+    return f'select top 1000 Date FROM [Stock].[dbo].[RowDay_{xTicker}] order by date desc'
+
 
 
 def DelLastDay( xTicker, SqlMaxDate):
@@ -32,5 +36,5 @@ def DelDupDay( xTicker):
             f"	FROM [analsy].[dbo].AnalysDay_{xTicker}) AS T WHERE DupRank > 1"
 def DelDupHour( xTicker):
     return  "DELETE T FROM ("+\
-            "	SELECT *, DupRank = ROW_NUMBER() OVER (PARTITION BY [Datetime] ORDER BY (SELECT NULL))"+\
+            "	SELECT *, DupRank = ROW_NUMBER() OVER (PARTITION BY [date] ORDER BY (SELECT NULL))"+\
             f"	FROM [analsy].[dbo].AnalysHour_{xTicker}) AS T WHERE DupRank > 1"  

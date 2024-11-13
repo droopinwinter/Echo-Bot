@@ -9,6 +9,21 @@ from datetime import timedelta
 import conn_db
 import collect_sql_cmd
 
+def ClearAnalysHour( xTicker1):               
+    SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastHour(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+    conn_db.cur_Stock.execute( collect_sql_cmd.DelLastHour(yTicker, SqlMaxDate) )
+    conn_db.con_Stock.commit()
+    conn_db.cur_Stock.execute( collect_sql_cmd.DelDupHour(yTicker) )
+    conn_db.con_Stock.commit() 
+
+
+def ClearAnalysDay( xTicker1):                       
+    SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastDay(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+    conn_db.cur_Stock.execute( collect_sql_cmd.DelLastDay(yTicker, SqlMaxDate) )
+    conn_db.con_Stock.commit()
+    conn_db.cur_Stock.execute( collect_sql_cmd.DelDupDay(yTicker) )
+    conn_db.con_Stock.commit()     
+
 try:
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     pd_read_sql = pd.read_sql(collect_sql_cmd.s_Stock_Ticker, conn_db.eng_Stock)
@@ -31,14 +46,17 @@ try:
         conn_db.cur_Stock.execute( collect_sql_cmd.DelLastDay(yTicker, SqlMaxDate) )
         conn_db.con_Stock.commit()
         yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1d').to_sql( 'RowDay_'+yTicker,conn_db.eng_Stock,if_exists='append', index=True)        
-        #週K
+
         
+
+        '''
+        #週K
         SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastWeek(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
         conn_db.cur_Stock.execute( collect_sql_cmd.DelLastWeek(yTicker, SqlMaxDate) )
         conn_db.con_Stock.commit()
         yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1wk').to_sql( 'RowWeek_'+yTicker,conn_db.eng_Stock,if_exists='append', index=True)        
 
-        '''
+
         #初始下載歷史資料
         yf.download(i,period='1d',interval='1h').to_sql( 'RowHour_'+i.strip(),engine,if_exists='append', index=True)
         time.sleep(5) 

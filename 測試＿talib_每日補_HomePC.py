@@ -8,46 +8,39 @@ from datetime import datetime
 from datetime import timedelta
 import talib
 from talib import abstract
-import conn_db
-import talib_sql_cmd
+import conn_db as db
+import talib_sql_cmd as cmd
+import collect_sql_cmd
 
+def ClearAnalysHour( xTicker1,):
+    SqlMaxDate = pd.read_sql(cmd.SLastHour( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+    db.cursor_analsy.execute(cmd.DelLastHour( xTicker1, SqlMaxDate) )
+    db.conn_analsy.commit()    
+    db.cursor_analsy.execute(cmd.DelDupHour( xTicker1) )
+    db.conn_analsy.commit()
+    return SqlMaxDate
 
-def ClearAnalys( xTicker1, eng_analsy, talib_sql_cmd):
-    SqlMaxDate = pd.read_sql(talib_sql_cmd.SLastHour( xTicker1), eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
-    cursor.execute(talib_sql_cmd.DelDupHour( xTicker1, SqlMaxDate) )
-    conn.commit()
-
-    SqlMaxDate = pd.read_sql(talib_sql_cmd.SLastDay( xTicker1), eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
-    cursor.execute(talib_sql_cmd.DelDupDay( xTicker1, SqlMaxDate) )
-    conn.commit()
+def ClearAnalysDay( xTicker1,):
+    SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+    db.cursor_analsy.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
+    db.conn_analsy.commit()    
+    db.cursor_analsy.execute(cmd.DelDupDay( xTicker1) )
+    db.conn_analsy.commit()
+    return SqlMaxDate
 
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
-    conn = pymssql.connect(host="192.168.244.8:1433", user='sa', password='abc123', database='analsy',charset='GBK')
-    cursor = conn.cursor()    
-    engine = create_engine("mssql+pymssql://sa:abc123@192.168.244.8:1433/Stock?charset=GBK")
-    engine1 = create_engine("mssql+pymssql://sa:abc123@192.168.244.8:1433/analsy?charset=GBK")
-
-    sql = 'select * FROM [Stock].[dbo].[TechAnalysis] '
-    pd_TechAnalysis = pd.read_sql(sql, engine)
-    
-    sql2 = 'select * FROM [Stock].[dbo].[Ticker] '
+    pd_TechAnalysis = pd.read_sql(cmd.s_Stock_TechAnalysis, db.eng_Stock)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
-    pd_read_sql = pd.read_sql(sql2, engine)
+    pd_read_sql = pd.read_sql(cmd.s_Stock_Ticker, db.eng_Stock)
     for i in pd_read_sql.Stock:
         print('Stock_'+i)
+        yTicker = i.strip()
         try:
             #SRSI
-            sql3 = 'select max(Date) Date FROM [analsy].[dbo].AnalysDay_' +i.strip()
-            SqlMaxDate = pd.read_sql(sql3, engine1).iat[0, 0].strftime("%Y-%m-%d")
-            sql4 = "DELETE [analsy].[dbo].AnalysDay_"+ i.strip()+" Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
-            cursor.execute(sql4)
-            conn.commit()
-
-            sql3 = 'select top 1000 Date FROM [Stock].[dbo].[RowDay_'+i.strip()+'] order by date desc'
-            SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select * FROM [Stock].[dbo].[RowDay_"+i.strip()+"] where date >='"+SqlMinDate+" 00:00:00.000'"
-            data = pd.read_sql(sql3, engine, parse_dates=True)
+            SqlMaxDate = ClearAnalysDay( yTicker)
+            SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
+            data       = pd.read_sql(cmd.SPeriodDay( yTicker,SqlMinDate), db.eng_Stock, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
                 rztcoul = pd_TechAnalysis.at[x,"RztLabel"].strip().split(',')
@@ -66,29 +59,21 @@ try:
                 data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data1.reset_index(drop=True)
                 data.columns = ["date","open","high","low","close","adjclose","colume",\
-                        "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
-                        "willrd","willrw","willrm",\
+                        "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m","willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
                         "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
-                data.to_sql( 'AnalysDay_'+i.strip(),engine1,if_exists='append', index=False)
+                data.to_sql( 'AnalysDay_'+yTicker,db.eng_analsy,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
-                print('回存資料庫錯誤_', i.strip() , errMsg)    
+                print('回存資料庫錯誤_', yTicker , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
-            print('Day發生錯誤-'+i.strip() , errMsg)            
+            print('Day發生錯誤-'+yTicker , errMsg)            
 
         try:
             #小時K
-            sql3 = 'select max(Date) Date FROM [analsy].[dbo].AnalysHour_' +i.strip()
-            SqlMaxDate = pd.read_sql(sql3, engine1).iat[0, 0].strftime("%Y-%m-%d")
-            sql4 = "DELETE [analsy].[dbo].AnalysHour_"+ i.strip()+" Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
-            cursor.execute(sql4)
-            conn.commit()
-
-            sql3 = 'select top 1000 Datetime Date FROM [Stock].[dbo].[RowHour_'+i.strip()+'] order by date desc'
-            SqlMinDate = pd.read_sql(sql3, engine).iat[999, 0].strftime("%Y-%m-%d")
-            sql3 = "select * FROM [Stock].[dbo].[RowHour_"+i.strip()+"] where datetime >='"+SqlMinDate+" 00:00:00.000'"
-            data = pd.read_sql(sql3, engine, parse_dates=True)
+            SqlMaxDate = ClearAnalysHour( yTicker)
+            SqlMinDate = pd.read_sql(cmd.S1000StockHour(yTicker)         , db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
+            data       = pd.read_sql(cmd.SPeriodHour( yTicker,SqlMinDate), db.eng_Stock, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
             for x in range(0,22):
                 rztcoul = pd_TechAnalysis.at[x,"RztLabel"].strip().split(',')
@@ -107,16 +92,15 @@ try:
                 data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data1.reset_index(drop=True)
                 data.columns = ["date","open","high","low","close","adjclose","colume",\
-                        "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
-                        "willrd","willrw","willrm",\
+                        "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m","willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
                         "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
-                data.to_sql( 'AnalysHour_'+i.strip(),engine1,if_exists='append', index=False)
+                data.to_sql( 'AnalysHour_'+i.strip(),db.eng_analsy,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
-                print('回存資料庫錯誤_', i.strip() , errMsg)    
+                print('回存資料庫錯誤_', yTicker , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
-            print('發生錯誤-'+i.strip() , errMsg)            
+            print('發生錯誤-'+yTicker , errMsg)            
 
         
         #週K
