@@ -68,7 +68,7 @@ try:
                 print('回存資料庫錯誤_', yTicker , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
             print('Day發生錯誤-'+yTicker , errMsg)            
-
+        '''
         try:
             #小時K
             SqlMaxDate = ClearAnalysHour( yTicker)
@@ -101,6 +101,7 @@ try:
                 print('回存資料庫錯誤_', yTicker , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
             print('發生錯誤-'+yTicker , errMsg)            
+        '''
 
         
         #週K
