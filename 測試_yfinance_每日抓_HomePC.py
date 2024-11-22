@@ -28,7 +28,7 @@ def ClearAnalysDay( xTicker1):
 try:
     warnings.simplefilter(action="ignore", category=FutureWarning)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
-    pd_read_sql = pd.read_sql(collect_sql_cmd.s_Stock_Ticker, conn_db.eng_Stock)
+    pd_read_sql = pd.read_sql(collect_sql_cmd.s_Stock_Ticker_TW, conn_db.eng_Stock)
     for i in pd_read_sql.Stock:
         print('Stock_'+i)
         yTicker = i.strip()
