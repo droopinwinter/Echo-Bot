@@ -1,18 +1,18 @@
 #analsy_sql_cmd
 
 s_Stock_Ticker_apk = 'select * FROM [Stock].[dbo].[Ticker_apk] '
-
+s_Stock_Ticker_TW  = 'select * FROM [Stock].[dbo].[Ticker_TW1] '
 
 def SLastDay( xTicker):
-    return f'select max(Date) Date FROM [apka].[dbo].ApkaDay_{xTicker}'    
+    return f'select max(Date) Date FROM [apka].[dbo].[ApkaDay_{xTicker}]'    
 
 def DelLastDay( xTicker, SqlMaxDate):
-    return f"DELETE [apka].[dbo].ApkaDay_{xTicker} Where Date >= '{SqlMaxDate} 00:00:00.000'"
+    return f"DELETE [apka].[dbo].[ApkaDay_{xTicker}] Where Date >= '{SqlMaxDate} 00:00:00.000'"
 
 def DelDupDay( xTicker):
     return  "DELETE T FROM ("+\
             "	SELECT *, DupRank = ROW_NUMBER() OVER (PARTITION BY [date] ORDER BY (SELECT NULL))"+\
-            f"	FROM [apka].[dbo].ApkaDay_{xTicker}) AS T WHERE DupRank > 1"
+            f"	FROM [apka].[dbo].[ApkaDay_{xTicker}]) AS T WHERE DupRank > 1"
  
 def sqlCommand( xcode, kind, Bef1YerDate):
     BaseSql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\

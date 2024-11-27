@@ -13,7 +13,11 @@ import talib_sql_cmd as cmd
 import collect_sql_cmd
 
 def ClearAnalysHour( xTicker1,):
-    SqlMaxDate = pd.read_sql(cmd.SLastHour( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+    Arr_date = pd.read_sql(cmd.SLastHour( xTicker1), db.eng_analsy)
+    if Arr_date.count >=1 :
+        SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
+    else:
+        SqlMaxDate = datetime.timedelta(days = -1000)
     db.cursor_analsy.execute(cmd.DelLastHour( xTicker1, SqlMaxDate) )
     db.conn_analsy.commit()    
     db.cursor_analsy.execute(cmd.DelDupHour( xTicker1) )

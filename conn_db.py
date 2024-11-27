@@ -9,6 +9,9 @@ cur_Stock = con_Stock.cursor()
 conn_analsy   = pymssql.connect(host="127.0.0.1:1433", user='sa', password='abc123', database='analsy',charset='GBK')
 cursor_analsy = conn_analsy.cursor()    
 
+conn_apka   = pymssql.connect(host="127.0.0.1:1433", user='sa', password='abc123', database='apka',charset='GBK')
+cursor_apka = conn_apka.cursor()    
+
 eng_Stock  = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/Stock?charset=GBK")
 eng_analsy = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/analsy?charset=GBK")
 eng_apka   = create_engine("mssql+pymssql://sa:abc123@127.0.0.1:1433/apka?charset=GBK")

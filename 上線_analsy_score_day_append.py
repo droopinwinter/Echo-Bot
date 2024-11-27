@@ -63,17 +63,18 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 
 TotTredRoc = pd.DataFrame()
 cnt =1
-for xcode in Ticker.Stock:
-    print('Stock_'+xcode.strip())
+for i in Ticker.Stock:
+    xcode = i.strip()
+    print('Stock_'+xcode)
     
-    sql3 = 'select max(Date) Date FROM [apka].[dbo].ApkaDay_' +xcode.strip()
+    sql3 = f'select max(Date) Date FROM [apka].[dbo].[ApkaDay_{xcode}]'
     SqlMaxDate = pd.read_sql(sql3, engine1).iat[0, 0].strftime("%Y-%m-%d")
-    sql4 = "DELETE [apka].[dbo].ApkaDay_"+ xcode.strip()+" Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
+    sql4 = f"DELETE [apka].[dbo].[ApkaDay_{xcode}] Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
     cursor.execute(sql4)
     conn.commit()
     
     #==========================================
-    sql3 = sqlCommand( xcode.strip() ,4, Bef1YerDate)
+    sql3 = sqlCommand( xcode ,4, Bef1YerDate)
     #==========================================
     data = pd.read_sql(sql3, engine1, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\

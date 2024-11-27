@@ -64,7 +64,7 @@ def score_xcom(apkaCom):
         else:
             xcmb =apkaCom.at[i,"OscSum"]
             xremark = '未知'
-        a = [ apkaCom.at[i,'date'], xcmb, xremark, xstate]
+        a = [ apkaCom.at[i,'date'], xcmb, xremark.encode('gbk').decode('cp936'), xstate]
         cmb = pd.concat([cmb, pd.DataFrame([a])], ignore_index=True)
     cmb.columns = ["date", "xcmb","xremark", "xstate"]
     return cmb
