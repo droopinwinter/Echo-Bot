@@ -14,69 +14,52 @@ import apka_score_oscillate
 import analsy_score_xcom
 import Trade
 import trad_record
+import analsy_sql_cmd as cmd
+import conn_db as db
+import sys
 
-def sqlCommand( xcode, kind, Bef1YerDate):
-        #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000'
-    # > '2021-05-03 00:00:00.000'
-    BaseSql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
-            [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
-            [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
-            FROM [analsy].[dbo]."
-    if   kind ==1:
-        sql = BaseSql +"[AnalysDay_"+xcode+"] Where date between '2023-05-03 00:00:00.000' and '2024-05-29 00:00:00.000' order by date " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "
-    elif   kind ==2:
-        sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '2021-05-28 00:00:00.000' order by date " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "        
-    elif kind ==3:
-        sql = BaseSql +"[AnalysHour3_"+xcode+"] WHere date > '2024-01-03 00:00:00.000' order by date " #AnalysHour3_SPY
-    elif kind ==4:#Bef1YerDate.strftime("%Y-%m-%d, %H:%M:%S")
-        sql = BaseSql +"[AnalysDay_"+xcode+"] WHere date > '"+Bef1YerDate.strftime("%Y-%m-%d %H:%M:%S") +"' order by date " #between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' " 
-    elif kind ==5:#Bef1YerDate.strftime("%Y-%m-%d, %H:%M:%S")
-        sql = BaseSql +"[AnalysDay_"+xcode+"] order by date "#between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "                  
+stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.TW','00640L.TW','00635U.TW','00693U.TW','00763U.TW','00683L.TW','00663L.TW','00709.TW','00660.TW','00682U.TW']
+
+def ClearApkaDay( xTicker1):
+    #SqlMaxDate = '2023-12-22'
+    Arr_date = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_apka)
+    if len(Arr_date) >=1 :
+        SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
     else:
-        sql = "select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
-                [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\
-                [ema1],[ema2],[ema3],[ema4],[ema5],[ema6],[ema7],[ema8],[ema9],[ema10]\
-                FROM [analsy].[dbo].[AnalysDay_"+xcode+"] WHere date between '202-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "        
-    return sql
+        SqlMaxDate = datetime.timedelta(days = -1000)    
+    #SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_apka).iat[0, 0].strftime("%Y-%m-%d")
+    db.cursor_apka.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
+    db.conn_apka.commit()    
+    db.cursor_apka.execute(cmd.DelDupDay( xTicker1) )
+    db.conn_apka.commit()
+    return SqlMaxDate
 
-try:
-    # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
-    conn = pymssql.connect(host="192.9.12.226:1433", user='sa', password='abc123', database='Stock',charset='GBK')
-    cursor = conn.cursor()    
-    engine = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/Stock?charset=GBK")
-    engine1 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/analsy?charset=GBK")
-    engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
-    engine3 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/trade?charset=GBK")
-    #sql = 'select * FROM [Stock].[dbo].[ApkaRating_day] '
-    #pd_TechAnalysis = pd.read_sql(sql, engine)
-
-    sql2 = 'select * FROM [Stock].[dbo].[Ticker_apk] '
-    Ticker = pd.read_sql(sql2, engine)
+try:  
     CurrDateTime = datetime.now()
     StrDate = CurrDateTime.strftime("%Y-%m-%d")
     StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")
     Bef1YerDate = CurrDateTime  - timedelta(days=365)
-
     print('實驗日期-時間 : ' , CurrDateTime)
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
     print('連線SQL發生錯誤-' , errMsg)
 
 TotTredRoc = pd.DataFrame()
 cnt =1
+sql_cmd = cmd.s_Stock_Ticker_TW
+if len(sys.argv) >=2:
+    if sys.argv[1] == 'TW':
+        sql_cmd = cmd.s_Stock_Ticker_TW
+Ticker = pd.read_sql(sql_cmd, db.eng_Stock)
 for i in Ticker.Stock:
-    xcode = i.strip()
-    print('Stock_'+xcode)
-    
-    sql3 = f'select max(Date) Date FROM [apka].[dbo].[ApkaDay_{xcode}]'
-    SqlMaxDate = pd.read_sql(sql3, engine1).iat[0, 0].strftime("%Y-%m-%d")
-    sql4 = f"DELETE [apka].[dbo].[ApkaDay_{xcode}] Where Date >= '"+SqlMaxDate+" 00:00:00.000'"
-    cursor.execute(sql4)
-    conn.commit()
-    
+#for i in stk_list1:
+    xcode = i.strip()    
+    print('apka_每日分析_'+xcode.strip())
+    SqlMaxDate = ClearApkaDay(xcode)
+    #SqlMaxDate = '2022-11-21'
     #==========================================
-    sql3 = sqlCommand( xcode ,4, Bef1YerDate)
+    sql3 = cmd.sqlCommand( xcode.strip() ,4, Bef1YerDate)
     #==========================================
-    data = pd.read_sql(sql3, engine1, parse_dates=True)
+    data = pd.read_sql(sql3, db.eng_analsy, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
                     "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
                     "willrd","willrw","willrm",\
@@ -110,13 +93,12 @@ for i in Ticker.Stock:
     SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime,1)
     SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+SqlMaxDate+" 00:00:00.000'"]
     try:
-        engine2 = create_engine("mssql+pymssql://sa:abc123@192.9.12.226:1433/apka?charset=GBK")
+        
         SingTredRoc.reset_index(drop=True)      
-        SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),engine2,if_exists='append', index=False)
+        SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),db.eng_apka,if_exists='append', index=False)
         SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt).zfill(2)+'_'+ xcode.strip()
-        #SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = xcode.strip()
         cnt = cnt+1
-        SingTredRoc.to_sql( 'ApkaDay_Combin',engine2,if_exists='append', index=False)
+        SingTredRoc.to_sql( 'ApkaDay_Combin',db.eng_apka,if_exists='append', index=False)
         #print(SingTredRoc)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         print('回存apka資料庫錯誤_', xcode.strip() , errMsg)   

@@ -131,9 +131,20 @@ def USdf2Chtext(df):
                         ,'TSM':  '股_台積電ADR'
                           }})
     return df1
-
-def df2Chtext(df):
-    df['bi'].replace(['[-20--1','持空單'],regex=True,inplace=True)
-    df['bi'].replace(['[20-1'  ,'持多單'],regex=True,inplace=True)
-    df['bi'].replace(['[0'     ,'觀望中'],regex=True,inplace=True)
+'''
+def buydf2Chtext(df):
+    df['bi'].replace(to_replace=r'[AB]''[-20--1'],value='持空單',regex=True,inplace=True)
+    df['bi'].replace('[20-1' ],value='持多單',regex=True,inplace=True)
+    df['bi'].replace('[0'    ],value='觀望中',regex=True,inplace=True)
     return df
+
+def buySigdf2Chtext(df):
+    df['buy'].replace(['[120-101','多止盈'],regex=True,inplace=True)
+    df['buy'].replace(['[20-1'   ,'做多單'],regex=True,inplace=True)
+    return df
+
+def SellSigdf2Chtext(df):
+    df['Sell'].replace(['[-120--101','空止盈'],regex=True,inplace=True)
+    df['Sell'].replace(['[-20--1'  ,'做空單'],regex=True,inplace=True)    
+    return df
+'''

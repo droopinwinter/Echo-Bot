@@ -10,14 +10,10 @@ import talib
 from talib import abstract
 import conn_db as db
 import talib_sql_cmd as cmd
-import collect_sql_cmd
+import sys
 
 def ClearAnalysHour( xTicker1,):
-    Arr_date = pd.read_sql(cmd.SLastHour( xTicker1), db.eng_analsy)
-    if Arr_date.count >=1 :
-        SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
-    else:
-        SqlMaxDate = datetime.timedelta(days = -1000)
+    SqlMaxDate = pd.read_sql(cmd.SLastHour( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
     db.cursor_analsy.execute(cmd.DelLastHour( xTicker1, SqlMaxDate) )
     db.conn_analsy.commit()    
     db.cursor_analsy.execute(cmd.DelDupHour( xTicker1) )
@@ -32,17 +28,27 @@ def ClearAnalysDay( xTicker1,):
     db.conn_analsy.commit()
     return SqlMaxDate
 
+stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.TW','00640L.TW','00635U.TW','00693U.TW','00763U.TW','00683L.TW','00663L.TW','00709.TW','00660.TW','00682U.TW']
+
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
     pd_TechAnalysis = pd.read_sql(cmd.s_Stock_TechAnalysis, db.eng_Stock)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
-    pd_read_sql = pd.read_sql(cmd.s_Stock_Ticker, db.eng_Stock)
+    sql_cmd = cmd.s_Stock_Ticker_TW  #s_Stock_Ticker
+    if len(sys.argv) >=2:
+        if sys.argv[1] == 'TW':
+            sql_cmd = cmd.s_Stock_Ticker_TW
+
+    pd_read_sql = pd.read_sql(sql_cmd, db.eng_Stock)
     for i in pd_read_sql.Stock:
-        print('Stock_'+i)
+    #for i in stk_list1:
+        print('talib_每日抓_'+i)
         yTicker = i.strip()
         try:
             #SRSI
             SqlMaxDate = ClearAnalysDay( yTicker)
+            #SqlMaxDate = '2023-11-21'
+            #SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             data       = pd.read_sql(cmd.SPeriodDay( yTicker,SqlMinDate), db.eng_Stock, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
@@ -105,9 +111,7 @@ try:
                 print('回存資料庫錯誤_', yTicker , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
             print('發生錯誤-'+yTicker , errMsg)            
-        '''
-
-        
+        '''       
         #週K
         '''
         sql3 = 'select top 1 max(Date) Date FROM [Stock].[dbo].[RowWeek_'+i.strip()+'] '

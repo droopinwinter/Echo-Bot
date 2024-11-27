@@ -6,58 +6,65 @@ import pandas as pd
 from pandas import DataFrame,Series
 from datetime import datetime
 from datetime import timedelta
-import conn_db
-import collect_sql_cmd
+import conn_db as db
+import collect_sql_cmd as cmd
 import warnings
+import sys
 
 def ClearAnalysHour( xTicker1):               
-    SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastHour(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
-    conn_db.cur_Stock.execute( collect_sql_cmd.DelLastHour(yTicker, SqlMaxDate) )
-    conn_db.con_Stock.commit()
-    conn_db.cur_Stock.execute( collect_sql_cmd.DelDupHour(yTicker) )
-    conn_db.con_Stock.commit() 
+    SqlMaxDate = pd.read_sql(cmd.SLastHour(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+    db.cur_Stock.execute( cmd.DelLastHour(yTicker, SqlMaxDate) )
+    db.con_Stock.commit()
+    db.cur_Stock.execute( cmd.DelDupHour(yTicker) )
+    db.con_Stock.commit() 
 
 
 def ClearAnalysDay( xTicker1):                       
-    SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastDay(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
-    conn_db.cur_Stock.execute( collect_sql_cmd.DelLastDay(yTicker, SqlMaxDate) )
-    conn_db.con_Stock.commit()
-    conn_db.cur_Stock.execute( collect_sql_cmd.DelDupDay(yTicker) )
-    conn_db.con_Stock.commit()     
-
+    SqlMaxDate = pd.read_sql(cmd.SLastDay(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+    db.cur_Stock.execute( cmd.DelLastDay(yTicker, SqlMaxDate) )
+    db.con_Stock.commit()
+    db.cur_Stock.execute( cmd.DelDupDay(yTicker) )
+    db.con_Stock.commit()     
+    
 try:
     warnings.simplefilter(action="ignore", category=FutureWarning)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
-    pd_read_sql = pd.read_sql(collect_sql_cmd.s_Stock_Ticker, conn_db.eng_Stock)
+    sql_cmd = cmd.s_Stock_Ticker
+    if len(sys.argv) >=2:
+        if sys.argv[1] == 'TW':
+            sql_cmd = cmd.s_Stock_Ticker_TW
+            CurrDate1 = datetime.now() + timedelta(days=1)
+            CurrDate = CurrDate1.strftime("%Y-%m-%d")
+    pd_read_sql = pd.read_sql(sql_cmd, db.eng_Stock)
     for i in pd_read_sql.Stock:
-        print('Stock_'+i)
+        print('yfinance_每日抓_'+i)
         yTicker = i.strip()
         #yf.download(i,period='2y',interval='1h').to_csv('RowHr_'+i.strip()+'.csv')#to_sql( 'RowDay_'+i.strip(),engine,if_exists='append', index=True)
         #小時K
         '''
-        conn_db.cur_Stock.execute( collect_sql_cmd.DelDupHour(yTicker) )
-        conn_db.con_Stock.commit()                
-        SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastHour(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
-        conn_db.cur_Stock.execute( collect_sql_cmd.DelLastHour(yTicker, SqlMaxDate) )
-        conn_db.con_Stock.commit()
-        yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1h').to_sql( 'RowHour_'+yTicker,conn_db.eng_Stock,if_exists='append', index=True)
+        db.cur_Stock.execute( cmd.DelDupHour(yTicker) )
+        db.con_Stock.commit()                
+        SqlMaxDate = pd.read_sql(cmd.SLastHour(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        db.cur_Stock.execute( cmd.DelLastHour(yTicker, SqlMaxDate) )
+        db.con_Stock.commit()
+        yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1h').to_sql( 'RowHour_'+yTicker,db.eng_Stock,if_exists='append', index=True)
         '''
         #日K
-        conn_db.cur_Stock.execute( collect_sql_cmd.DelDupDay(yTicker) )
-        conn_db.con_Stock.commit()                        
-        SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastDay(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
-        conn_db.cur_Stock.execute( collect_sql_cmd.DelLastDay(yTicker, SqlMaxDate) )
-        conn_db.con_Stock.commit()
-        yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1d').to_sql( 'RowDay_'+yTicker,conn_db.eng_Stock,if_exists='append', index=True)        
+        db.cur_Stock.execute( cmd.DelDupDay(yTicker) )
+        db.con_Stock.commit()                        
+        SqlMaxDate = pd.read_sql(cmd.SLastDay(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        db.cur_Stock.execute( cmd.DelLastDay(yTicker, SqlMaxDate) )
+        db.con_Stock.commit()
+        yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1d').to_sql( 'RowDay_'+yTicker,db.eng_Stock,if_exists='append', index=True)        
 
         
 
         '''
         #週K
-        SqlMaxDate = pd.read_sql(collect_sql_cmd.SLastWeek(yTicker), conn_db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
-        conn_db.cur_Stock.execute( collect_sql_cmd.DelLastWeek(yTicker, SqlMaxDate) )
-        conn_db.con_Stock.commit()
-        yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1wk').to_sql( 'RowWeek_'+yTicker,conn_db.eng_Stock,if_exists='append', index=True)        
+        SqlMaxDate = pd.read_sql(cmd.SLastWeek(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        db.cur_Stock.execute( cmd.DelLastWeek(yTicker, SqlMaxDate) )
+        db.con_Stock.commit()
+        yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1wk').to_sql( 'RowWeek_'+yTicker,db.eng_Stock,if_exists='append', index=True)        
 
 
         #初始下載歷史資料

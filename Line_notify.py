@@ -7,15 +7,15 @@ import pandas as pd
 import time
 import notify_sql_cmd as cmd
 import conn_db as db
-import symbol2Chtext
+import symbol2Chtext as cv
 import sys 
 
-manual = "\n趨勢技術分析-訊號縮寫如下\n"+\
-         "bi= buy  當下買賣狀態(-20~20) 大於0時表已進場做多\n"+\
-         "md= MACD 日K+週K趨勢(-4~4)    大於2時表確定漲勢\n"+\
-         "sp= slop 3日漲跌斜率(-20~20)  大於1時3日均漲幅>1％ \n"+\
-         "os= OSC  綜合震盪極限(-8~8)   小於-6時可能超跌\n"+\
-         "BB=BBand 日K布林區間(0.0~1.0) 小於0.1下，搭配OSC小於-6可能反轉\n"
+manual = "\n技術分析-日K+週K-綜合訊號說明如下\n"+\
+         "buy  當下買賣狀態(-20~20 )大於0時為多倉,小於0時為空倉\n"+\
+         "slop 3日漲跌斜率(-20~20)  大於1時3日均漲幅>1％ \n"+\
+         "OSC  綜合震盪極限(-8~8)   小於-6時疑超跌,大於6時疑超漲\n"+\
+         "MACD 日K+週K趨勢(-4~4)    大於2時確認牛市\n"+\
+         "BB   日K布林區間(0.0~1.0) 小於0.1下，搭配OSC大於6疑反轉\n"
 def lineNotify(msg):
     url = 'https://notify-api.line.me/api/notify'
     token = 'HsPrW2IKr4JpdhJB7x1RpG5iMZNEMH60f9V3BkkimOb'#'Cw2ifsTDcyllU50bnKKik6d9y3nez6O4PGjmX5uUXSP'  # 替換成自己的 LINE Notify 權杖
@@ -27,13 +27,16 @@ def lineNotify(msg):
 def read_sql(SqlStr, engine):
    Ticker = pd.read_sql(SqlStr, engine)
    Ticker =Ticker.drop(columns=["date"])
-   Ticker = symbol2Chtext.USdf2Chtext(Ticker)
+   Ticker = cv.USdf2Chtext(Ticker)
    for col in Ticker.columns:
       Ticker[col] = Ticker[col].astype(str)
-      Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 5), side='left')
+      Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 2), side='left')
       if col == 'typ':
-         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 4), side='right')
-         
+         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 6), side='right')
+      '''
+      if col == 'SellSig':
+         Ticker = cv.SellSigdf2Chtext(Ticker)         
+      '''
    StrDate = Ticker.to_string()
    #for col in Ticker.columns:
    #  Ticker[col] = Ticker[col].str.pad(min(len(Ticker[col]), 4), side='both') # 填充到指定长度，不足则右对齐    
