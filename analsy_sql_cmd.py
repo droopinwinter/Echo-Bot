@@ -1,6 +1,6 @@
 #analsy_sql_cmd
 
-s_Stock_Ticker_apk = 'select * FROM [Stock].[dbo].[Ticker_apk] '
+s_Stock_Ticker = 'select * FROM [Stock].[dbo].[Ticker_apk] '
 s_Stock_Ticker_TW  = 'select * FROM [Stock].[dbo].[Ticker_TW1] '
 
 def SLastDay( xTicker):

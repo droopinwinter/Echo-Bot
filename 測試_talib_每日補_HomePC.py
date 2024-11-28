@@ -34,7 +34,7 @@ try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
     pd_TechAnalysis = pd.read_sql(cmd.s_Stock_TechAnalysis, db.eng_Stock)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
-    sql_cmd = cmd.s_Stock_Ticker_TW  #s_Stock_Ticker
+    sql_cmd = cmd.s_Stock_Ticker  #s_Stock_Ticker
     if len(sys.argv) >=2:
         if sys.argv[1] == 'TW':
             sql_cmd = cmd.s_Stock_Ticker_TW

@@ -45,7 +45,7 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 
 TotTredRoc = pd.DataFrame()
 cnt =1
-sql_cmd = cmd.s_Stock_Ticker_TW
+sql_cmd = cmd.s_Stock_Ticker
 if len(sys.argv) >=2:
     if sys.argv[1] == 'TW':
         sql_cmd = cmd.s_Stock_Ticker_TW

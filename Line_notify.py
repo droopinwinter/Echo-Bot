@@ -11,7 +11,7 @@ import symbol2Chtext as cv
 import sys 
 
 manual = "\n技術分析-日K+週K-綜合訊號說明如下\n"+\
-         "buy  當下買賣狀態(-20~20 )大於0時為多倉,小於0時為空倉\n"+\
+         "Sta  當下買賣狀態(-20~20 )大於0時為多倉,小於0時為空倉\n"+\
          "slop 3日漲跌斜率(-20~20)  大於1時3日均漲幅>1％ \n"+\
          "OSC  綜合震盪極限(-8~8)   小於-6時疑超跌,大於6時疑超漲\n"+\
          "MACD 日K+週K趨勢(-4~4)    大於2時確認牛市\n"+\
@@ -30,7 +30,7 @@ def read_sql(SqlStr, engine):
    Ticker = cv.USdf2Chtext(Ticker)
    for col in Ticker.columns:
       Ticker[col] = Ticker[col].astype(str)
-      Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 2), side='left')
+      Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 4), side='left')
       if col == 'typ':
          Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 6), side='right')
       '''
@@ -49,12 +49,12 @@ def NotifyComm(ybefDay,yStrDate,ycountry):
    msg1 = read_sql(cmd.Sig2BuySell(ybefDay,ycountry), db.eng_apka)
    if msg1 !='':
       lineNotify( "\n日期 : "+ yStrDate +"\n買賣徵兆\n"+  msg1)
-   msg2 =  read_sql(cmd.Sig2LowBull(ybefDay,ycountry), db.eng_apka)
-   if msg2 !='':
-      lineNotify( "\n日期 : "+ yStrDate +"\n接近布林帶下沿\n"+ msg2)
+   #msg2 =  read_sql(cmd.Sig2LowBull(ybefDay,ycountry), db.eng_apka)
+   #if msg2 !='':
+   #   lineNotify( "\n日期 : "+ yStrDate +"\n接近布林帶下沿\n"+ msg2)
    msg3 = read_sql(cmd.Sig2HighBull(ybefDay,ycountry), db.eng_apka)
    if msg3 !='':
-      lineNotify( "\n日期 : "+ yStrDate +"\n接近布林帶上沿\n"+ msg3)
+      lineNotify( "\n日期 : "+ yStrDate +"\n逼近布林帶邊緣且有極端反轉訊號\n"+ msg3)
 
 
 Bef1Date = datetime.now()  - timedelta(days=1)
@@ -69,7 +69,7 @@ try:
          NotifyComm(befDay, StrDate, country)
          msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
          if msg5 !='':
-            lineNotify( "\n日期 : "+ StrDate + manual)
+            #lineNotify( "\n日期 : "+ StrDate + manual)
             lineNotify("_股指_前22個\n"+msg5)
          
          msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
@@ -84,7 +84,7 @@ try:
       NotifyComm(befDay, StrDate, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify( "\n日期 : "+ StrDate + manual)
+         #lineNotify( "\n日期 : "+ StrDate + manual)
          lineNotify("_股指_＆板塊_前22個\n"+msg5)
       
       

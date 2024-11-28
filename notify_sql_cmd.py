@@ -35,7 +35,7 @@ def Sig2LowBull( befDate, countyr):
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"  
     return f"SELECT distinct [date],[BBlevel] BB,[OscSum] Osc,[TrnSlop] slop ,{mark} typ "+\
        " FROM [apka].[dbo].[ApkaDay_Combin] "+\
-       f" where date {dateR} AND ([BBlevel]<0.2 ) {countyr} order by date,typ "
+       f" where date {dateR} AND ([BBlevel]<0.2 ) and [OscSum] >=3 {countyr} order by date,typ "
 
 #=================================================
 # 接近布林帶上沿
@@ -50,7 +50,7 @@ def Sig2HighBull( befDate, countyr):
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
     return f"SELECT distinct [date],[BBlevel] BB,[OscSum] Osc,[TrnSlop] slop ,{mark} typ "+\
        " FROM [apka].[dbo].[ApkaDay_Combin]  "+\
-       f" where date {dateR} AND ([BBlevel]>0.9 ) {countyr} order by date,typ"
+       f" where date {dateR} AND (([BBlevel]>0.9 and [OscSum] <=-3) or ([BBlevel]<0.1 and [OscSum] >=3))  {countyr} order by date,typ"
 #=================================================
 # 當日收盤後技術分析擺盪
 def Sig2Osc( befDate, countyr):
@@ -85,7 +85,7 @@ def Sig2TrendAndOsc_part1( befDate, countyr):
         range   = "'01' and '80'"
         range   = "'01' and '22'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],[buy] buy,[TrnSlop] slop,[BBlevel] BB,[OscSum] OSC,[xmacd] MACD,[mark] typ FROM ( "+\
+    return "SELECT [date],[buy] Sta,[TrnSlop] slop,[BBlevel] BB,[OscSum] OSC,[xmacd] MACD,[mark] typ FROM ( "+\
       "  SELECT distinct [date],[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin] where date {dateR} {countyr} "+\
@@ -104,7 +104,7 @@ def Sig2TrendAndOsc_part2( befDate, countyr):
         mark    = "substring([xremark],4,5)"
         range   = "'23' and '44'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],[buy] buy,[TrnSlop] slop,[BBlevel] BB,[OscSum] Osc,[xmacd] MACD,[mark] typ FROM ( "+\
+    return "SELECT [date],[buy] Sta,[TrnSlop] slop,[BBlevel] BB,[OscSum] Osc,[xmacd] MACD,[mark] typ FROM ( "+\
       "  SELECT distinct [date],[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin] where date  {dateR} {countyr} "+\
@@ -123,7 +123,7 @@ def Sig2TrendAndOsc_part3( befDate, countyr):
         mark    = "substring([xremark],4,5)"  
         range   = "'22' and '40'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],[buy] buy,[TrnSlop] slop,[BBlevel] BB,[OscSum] OSC,[xmacd] MACD,[mark] typ FROM ( "+\
+    return "SELECT [date],[buy] Sta,[TrnSlop] slop,[BBlevel] BB,[OscSum] OSC,[xmacd] MACD,[mark] typ FROM ( "+\
       "  SELECT distinct [date],[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin] where date  {dateR}  {countyr} "+\
