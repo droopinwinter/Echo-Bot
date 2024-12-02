@@ -1,6 +1,8 @@
 #Trade
 import pandas as pd
-
+import os,sys
+from datetime import datetime
+import conn_db as db
 
 def TotProfit(xapka, Ticker, CurrDateTime, rzt):
 
@@ -132,6 +134,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt):
     xapka.fillna(0)
     #print(xapka.head())
     TredRoc = pd.DataFrame()
+    TredProfit = pd.DataFrame()
     for i in range(5,len(xapka)):
         totred = int (Xtred(i) or 0)
         toBuy = int (ToBuy(i, totred) or 0)
@@ -174,9 +177,27 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt):
             count = count +1
             total = total + total*xapka.at[i,"profit"]
     print( Ticker, "From [" + str(xapka.at[1,"date"]) +"] to ["+ str(xapka.at[len(xapka)-1,"date"]) +"] total =1000.0 after count: ["+str(count)+"] times total profit = "+str(round(total,3)) )
-    a = [Ticker+'_Total', 0, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
-    TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
+    
+
+    mtime = os.path.getmtime('D:\Stock_bk\Trade.py') #修改时间
+    mtime_string = datetime.fromtimestamp(int(mtime))
+    b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
+    TredProfit = pd.concat([TredProfit, pd.DataFrame([b])], ignore_index=True)
+    TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit", "CreatDate"]
+    #TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
     TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
+    ##############################################################################################
+    CurrDateTime = datetime.now()
+    if CurrDateTime.day == 1 :
+        try:
+            TredProfit.to_sql( 'TrateProf',db.eng_trade,if_exists='append', index=False)
+            TredRoc.to_sql( 'TrateRec_'+Ticker,db.eng_trade,if_exists='append', index=False)        
+            #print(SingTredRoc)
+        except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+            print('回存Trade資料庫錯誤_', Ticker , errMsg) 
+        
+    
+
 
     if rzt == 1:
         return xapka

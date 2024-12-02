@@ -84,7 +84,7 @@ try:
       NotifyComm(befDay, StrDate, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify( "\n日期 : "+ StrDate + manual)
+         #lineNotify( "\n日期 : "+ StrDate + manual)
          lineNotify("_股指_＆板塊_前22個\n"+msg5)
       
       
