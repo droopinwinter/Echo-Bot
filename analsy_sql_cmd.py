@@ -9,6 +9,11 @@ def SLastDay( xTicker):
 def DelLastDay( xTicker, SqlMaxDate):
     return f"DELETE [apka].[dbo].[ApkaDay_{xTicker}] Where Date >= '{SqlMaxDate} 00:00:00.000'"
 
+def DelDupDay_Combin(Country):
+    return  "DELETE T FROM ("+\
+            f"SELECT *, DupRank = ROW_NUMBER() OVER (PARTITION BY [date] ORDER BY (SELECT NULL)) FROM [apka].[dbo].[ApkaDay_Combin_{Country}]"+\
+            ") AS T WHERE DupRank > 1 "
+
 def DelDupDay( xTicker):
     return  "DELETE T FROM ("+\
             "	SELECT *, DupRank = ROW_NUMBER() OVER (PARTITION BY [date] ORDER BY (SELECT NULL))"+\
