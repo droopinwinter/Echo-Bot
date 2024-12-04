@@ -179,7 +179,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt):
     print( Ticker, "From [" + str(xapka.at[1,"date"]) +"] to ["+ str(xapka.at[len(xapka)-1,"date"]) +"] total =1000.0 after count: ["+str(count)+"] times total profit = "+str(round(total,3)) )
     
 
-    mtime = os.path.getmtime('D:\Stock_bk\Trade.py') #修改时间
+    mtime = os.path.getmtime('./Trade.py') #修改时间
     mtime_string = datetime.fromtimestamp(int(mtime))
     b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
     TredProfit = pd.concat([TredProfit, pd.DataFrame([b])], ignore_index=True)
