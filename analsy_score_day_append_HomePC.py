@@ -46,9 +46,11 @@ except Exception as errMsg:                   # 如果 try 的內容發生錯誤
 TotTredRoc = pd.DataFrame()
 cnt =1
 sql_cmd = cmd.s_Stock_Ticker
+Country = 'US'
 if len(sys.argv) >=2:
     if sys.argv[1] == 'TW':
         sql_cmd = cmd.s_Stock_Ticker_TW
+        Country = 'TW'
 Ticker = pd.read_sql(sql_cmd, db.eng_Stock)
 for i in Ticker.Stock:
 #for i in stk_list1:
@@ -90,18 +92,18 @@ for i in Ticker.Stock:
     cmb = analsy_score_xcom.score_xcom(apkaCom)
     apkaCom = pd.merge( apkaCom, cmb)    
     
-    SingTredRoc = Trade.TotProfit(apkaCom, xcode.strip(), CurrDateTime,1)
+    SingTredRoc = Trade.TotProfit(apkaCom, xcode, CurrDateTime,1)
     SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+SqlMaxDate+" 00:00:00.000'"]
     try:
-        
         SingTredRoc.reset_index(drop=True)      
-        SingTredRoc.to_sql( 'ApkaDay_'+xcode.strip(),db.eng_apka,if_exists='append', index=False)
-        SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt).zfill(2)+'_'+ xcode.strip()
+        SingTredRoc.to_sql( 'ApkaDay_'+xcode,db.eng_apka,if_exists='append', index=False)
+        SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt).zfill(2)+'_'+ xcode
         cnt = cnt+1
-        SingTredRoc.to_sql( 'ApkaDay_Combin',db.eng_apka,if_exists='append', index=False)
+        #SingTredRoc.query("A>10 & B<12").to_sql( 'ApkaDay_Combin_'+Country,db.eng_apka,if_exists='append', index=False)
+        SingTredRoc.to_sql( 'ApkaDay_Combin_'+Country,db.eng_apka,if_exists='append', index=False)
         #print(SingTredRoc)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
-        print('回存apka資料庫錯誤_', xcode.strip() , errMsg)   
+        print('回存apka資料庫錯誤_', xcode , errMsg)   
 
     
 

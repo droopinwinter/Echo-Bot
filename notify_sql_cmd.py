@@ -33,7 +33,7 @@ def Sig2LowBull( befDate, countyr):
         IfTw = "and right([xremark], 3) <> '.TW'"      
         mark    = "substring([xremark],4,5)"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"  
-    return f"SELECT distinct [date],left(TYP,3) TYP,[BBlevel] BB,[OscSum] Osc,[TrnSlop] slop ,{mark} STK "+\
+    return f"SELECT distinct [date],left(TYP,3) TYP,[BBlevel] BB,[OscSum] Osc,[TrnSlop] slp ,{mark} STK "+\
        f" FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] "+\
        f" where date {dateR} AND ([BBlevel]<0.2 ) and [OscSum] >=3 {IfTw} order by date,typ "
 
@@ -85,7 +85,7 @@ def Sig2TrendAndOsc_part1( befDate, countyr):
         range   = "'01' and '80'"
         range   = "'01' and '22'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] OSC,[xmacd] MACD,[buy] Sta,[mark] STK FROM ( "+\
+    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] OSC,[xmacd] MCD,[buy] St,[mark] STK FROM ( "+\
       "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date {dateR} {IfTw} "+\
@@ -104,7 +104,7 @@ def Sig2TrendAndOsc_part2( befDate, countyr):
         mark    = "substring([xremark],4,5)"
         range   = "'23' and '44'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] Osc,[xmacd] MACD,[buy] Sta,[mark] STK FROM ( "+\
+    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] Osc,[xmacd] MCD,[buy] St,[mark] STK FROM ( "+\
       "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR} {IfTw} "+\
@@ -123,7 +123,7 @@ def Sig2TrendAndOsc_part3( befDate, countyr):
         mark    = "substring([xremark],4,5)"  
         range   = "'22' and '40'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],[buy] Sta,[BBlevel] BB,[OscSum] OSC,[xmacd] MACD,[mark] STK FROM ( "+\
+    return "SELECT [date],[buy] Sta,[BBlevel] BB,[OscSum] OSC,[xmacd] MCD,[mark] STK FROM ( "+\
       "  SELECT distinct [date],[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR}  {IfTw} "+\

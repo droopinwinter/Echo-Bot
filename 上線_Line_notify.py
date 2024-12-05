@@ -33,18 +33,19 @@ def read_sql(SqlStr, engine):
       Ticker[col] = Ticker[col].astype(str)
       Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 4), side='left')
       if col == 'STK':
-         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 10), side='right')
+         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 12), side='right')
       if col == 'TYP':
-         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 2), side='right')
-      if col == 'BB':
-         Ticker[col] = Ticker[col].str.zfill(3)     
-      if col == 'Sta':
-         Ticker[col] = Ticker[col].str.zfill(4)                
+         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 1), side='left')
       '''
+      if col == 'BB':
+         Ticker[col] = Ticker[col].str.zfill(6)     
+      if col == 'Sta':
+         Ticker[col] = Ticker[col].str.zfill(6)                
+      
       if col == 'SellSig':
          Ticker = cv.SellSigdf2Chtext(Ticker)         
       '''
-   StrDate = Ticker.to_string(index=False)
+   StrDate = Ticker.to_string(index=False,header=False)
    #for col in Ticker.columns:
    #  Ticker[col] = Ticker[col].str.pad(min(len(Ticker[col]), 4), side='both') # 填充到指定长度，不足则右对齐    
    if len(Ticker) == 0 :
@@ -55,13 +56,13 @@ def read_sql(SqlStr, engine):
 def NotifyComm(ybefDay,yStrDate,ycountry):         
    msg1 = read_sql(cmd.Sig2BuySell(ybefDay,ycountry), db.eng_apka)
    if msg1 !='':
-      lineNotify( "\n日期 : "+ yStrDate +"\n買賣徵兆\n"+  msg1)
+      lineNotify( "\n日期 : "+ yStrDate +"\n買賣徵兆\n"+sBuyTitle +  msg1)
    #msg2 =  read_sql(cmd.Sig2LowBull(ybefDay,ycountry), db.eng_apka)
    #if msg2 !='':
    #   lineNotify( "\n日期 : "+ yStrDate +"\n接近布林帶下沿\n"+ msg2)
    msg3 = read_sql(cmd.Sig2HighBull(ybefDay,ycountry), db.eng_apka)
    if msg3 !='':
-      lineNotify( "\n日期 : "+ yStrDate +"\n逼近布林帶邊緣且有極端反轉訊號\n"+ msg3)
+      lineNotify( "\n日期 : "+ yStrDate +"\n逼近布林帶邊緣且有極端反轉訊號\n"+ sLimiTitle+msg3)
 
 
 Bef1Date = datetime.now()  - timedelta(days=1)
@@ -74,31 +75,44 @@ if len(sys.argv) >=2:
       country = 'TW'
       
 cmd.DelDupDay(country)
+stitle = "類別 布林 擺盪 多空 持倉 \n"+"        帶限 極限 趨勢 狀態 品種\n"
+sBuyTitle = "類別 進場 出場 擺盪 多空 \n"+"        信號 信號 極限 趨勢 品種\n"
+sLimiTitle = "類別 布林 擺盪 \n"+"        帶限 信號 極限 品種\n"
+'''
+"類別 布林 擺盪 多空 持倉 \n"+
+"        帶限 極限 趨勢 狀態 品種\n"
+
+"類別 進場 出場 擺盪 多空 \n"+
+"        信號 信號 極限 趨勢 品種\n"
+
+"類別 布林 擺盪 \n"+
+"        帶限 信號 極限 品種\n"
+'''
 try:
    if country == 'TW':      
       NotifyComm(befDay, StrDate, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
-         lineNotify("_股指_前22個\n"+msg5)
+         lineNotify("股指_前22個\n"+stitle+ msg5)
       
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("_ETF_共22個\n"+msg5)  
+         lineNotify("基金_共22個\n"+stitle+ msg5)  
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("_n其他＿共22個\n"+msg5)                     
+         lineNotify("其他＿共22個\n"+stitle+ msg5)                     
    else:
       NotifyComm(befDay, StrDate, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
-         lineNotify("_股指_＆板塊_前22個\n"+msg5)
+         lineNotify("股指_前22\n"+stitle+ msg5)
       
       
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("_大科技_共11個\n"+msg5)  
+         lineNotify("大科技&其他\n"+stitle+ msg5)  
       '''
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':

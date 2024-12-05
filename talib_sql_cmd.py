@@ -26,10 +26,10 @@ def DelLastHour( xTicker, SqlMaxDate):
 
 
 def SPeriodDay( xTicker,SqlMinDate):
-    return f"select * FROM [Stock].[dbo].[RowDay_{xTicker}] where date >='{SqlMinDate} 00:00:00.000'"
+    return f"select * FROM [Stock].[dbo].[RowDay_{xTicker}] where date >='{SqlMinDate} 00:00:00.000' order by date "
 
 def SPeriodHour( xTicker,SqlMinDate):
-    return f"select * FROM [Stock].[dbo].[RowHour_{xTicker}] where datetime >='{SqlMinDate} 00:00:00.000'"
+    return f"select * FROM [Stock].[dbo].[RowHour_{xTicker}] where datetime >='{SqlMinDate} 00:00:00.000'  order by date "
 
 
 def DelDupDay( xTicker):

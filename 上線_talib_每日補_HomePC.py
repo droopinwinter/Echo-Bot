@@ -66,8 +66,8 @@ try:
                     print('abstract發生錯誤-', pd_TechAnalysis.at[x,"name"] , errMsg)    
 
             try:          
-                data1 = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
-                data1.reset_index(drop=True)
+                data = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
+                data.reset_index(drop=True)
                 data.columns = ["date","open","high","low","close","adjclose","colume",\
                         "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m","willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
