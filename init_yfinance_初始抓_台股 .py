@@ -9,11 +9,14 @@ from datetime import timedelta
 import conn_db
 import collect_sql_cmd
 import warnings
+
+stk_list = ['00681R.TW']
 try:
     warnings.simplefilter(action="ignore", category=FutureWarning)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
     pd_read_sql = pd.read_sql(collect_sql_cmd.s_Stock_Ticker_TW, conn_db.eng_Stock)
-    for i in pd_read_sql.Stock:
+    for i in stk_list:    
+    #for i in pd_read_sql.Stock:
         yTicker = i.strip()
         print('Stock_'+yTicker)
         #小時K

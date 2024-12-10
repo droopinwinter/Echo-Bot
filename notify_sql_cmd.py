@@ -89,7 +89,7 @@ def Sig2TrendAndOsc_part1( befDate, countyr):
       "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date {dateR} {IfTw} "+\
-      f"  and typ in ('etf','index','main') ) a order by pre "
+      f"  and typ in ('etf','index','main') ) a order by typ,pre "
 #=================================================
 # 當日收盤後技術分析趨勢＿板塊11個
 def Sig2TrendAndOsc_part2( befDate, countyr):
@@ -108,7 +108,7 @@ def Sig2TrendAndOsc_part2( befDate, countyr):
       "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR} {IfTw} "+\
-      f"  and typ in ('stock')  ) a order by pre "
+      f"  and typ in ('stock')  ) a order by typ,pre "
 
 #=================================================
 # 當日收盤後技術分析趨勢＿大科技＿11個
@@ -127,4 +127,4 @@ def Sig2TrendAndOsc_part3( befDate, countyr):
       "  SELECT distinct [date],[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR}  {IfTw} "+\
-      f" and left([xremark], 2) between {range} ) a order by pre "
+      f" and left([xremark], 2) between {range} ) a order by typ,pre "

@@ -41,14 +41,14 @@ try:
             sql_cmd = cmd.s_Stock_Ticker_TW
 
     pd_read_sql = pd.read_sql(sql_cmd, db.eng_Stock)
-    for i in pd_read_sql.Stock:
-    #for i in stk_list:
+    #for i in pd_read_sql.Stock:
+    for i in stk_list:
         print('talib_每日抓_'+i)
         yTicker = i.strip()
         try:
             #SRSI
-            SqlMaxDate = ClearAnalysDay( yTicker)
-            #SqlMaxDate = '2023-11-21'
+            #SqlMaxDate = ClearAnalysDay( yTicker)
+            SqlMaxDate = '2023-11-21'
             #SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             data       = pd.read_sql(cmd.SPeriodDay( yTicker,SqlMinDate), db.eng_Stock, parse_dates=True)
