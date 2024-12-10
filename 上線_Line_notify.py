@@ -64,15 +64,17 @@ def NotifyComm(ybefDay,yStrDate,ycountry):
    if msg3 !='':
       lineNotify( "\n日期 : "+ yStrDate +"\n逼近布林帶邊緣且有極端反轉訊號\n"+ sLimiTitle+msg3)
 
-
-Bef1Date = datetime.now()  - timedelta(days=1)
+xToday = datetime.now()
+Bef1Date = xToday - timedelta(days=1)
+sToday = xToday.strftime("%Y-%m-%d")
 StrDate = Bef1Date.strftime("%Y-%m-%d")
-print('實驗日期-時間 : ' , StrDate)
+print('實驗日期-時間 : ' , sToday)
 befDay = '2'
 country = 'US'
 if len(sys.argv) >=2:
    if sys.argv[1] == 'TW':
       country = 'TW'
+      befDay = '1'
       
 cmd.DelDupDay(country)
 stitle = "類別 布林 擺盪 多空 持倉 \n"+"        帶限 極限 趨勢 狀態 品種\n"
@@ -90,7 +92,7 @@ sLimiTitle = "類別 布林 擺盪 \n"+"        帶限 信號 極限 品種\n"
 '''
 try:
    if country == 'TW':      
-      NotifyComm(befDay, StrDate, country)
+      NotifyComm(befDay, sToday, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
@@ -103,7 +105,7 @@ try:
       if msg5 !='':
          lineNotify("其他＿共22個\n"+stitle+ msg5)                     
    else:
-      NotifyComm(befDay, StrDate, country)
+      NotifyComm(befDay, sToday, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)

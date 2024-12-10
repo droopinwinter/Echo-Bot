@@ -24,7 +24,7 @@ stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.T
 def ClearApkaDay( xTicker1):
     #SqlMaxDate = '2023-12-22'
     Arr_date = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_apka)
-    if len(Arr_date) >=1 :
+    if len(Arr_date) >=1:
         SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
     else:
         SqlMaxDate = datetime.timedelta(days = -1000)    

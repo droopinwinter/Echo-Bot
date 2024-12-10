@@ -13,7 +13,7 @@ def Sig2BuySell( befDate, countyr):
     if countyr == 'TW':
         IfTw = "and right([xremark], 3) = '.TW'"
         mark    = "substring([xremark],4,10)"
-        dateR   = f"between GETDATE()-1 and  GETDATE()"     
+        dateR   = f"between GETDATE()-{befDate} and  GETDATE()"     
     else:
         IfTw = "and right([xremark], 3) <> '.TW'"  
         mark    = "substring([xremark],4,5)"  
