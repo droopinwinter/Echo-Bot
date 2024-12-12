@@ -19,7 +19,7 @@ import conn_db as db
 import sys
 
 
-stk_list = ['00681R.TW']
+stk_list = ['SPY']
 
 def ClearApkaDay( xTicker1):
     #SqlMaxDate = '2023-12-22'
@@ -59,11 +59,11 @@ Ticker = pd.read_sql(sql_cmd, db.eng_Stock)
 #for i in Ticker.Stock:
 for i in stk_list:
     xcode = i.strip()    
-    print('apka_每日分析_'+xcode.strip())
+    print('apka_每日分析_'+xcode)
     #SqlMaxDate = ClearApkaDay(xcode)
     SqlMaxDate = '2022-11-21'
     #==========================================
-    sql3 = cmd.sqlCommand( xcode.strip() ,4, Bef1YerDate)
+    sql3 = cmd.sqlCommand( xcode ,5, Bef1YerDate)
     #==========================================
     data = pd.read_sql(sql3, db.eng_analsy, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
@@ -71,8 +71,8 @@ for i in stk_list:
                     "willrd","willrw","willrm",\
                     "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                     "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
-                    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]#,\
-                    #"vap1","vap2","vap3","emavol1","emavol2","emavol3","vol2pri","volume"] 
+                    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
+                    "vap1","vap2","vap3","emavol1","emavol2","emavol3","vol2pri","volume"] 
     data.replace("Zero", 0)
     #data.set_index("date" , inplace=True)
     #print('Ticker='+xcode)
@@ -123,5 +123,5 @@ for i in stk_list:
     #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
     #trad_record.DoSummsry(TotTredRoc, CurrDateTime)
     #TotTredRoc.to_sql('TradeRecord1',engine3,if_exists='append', index=False)
-    #apka_score_ploy.plot(apkaCom, xcode.strip(),CurrDateTime)
+    #apka_score_ploy.plot(apkaCom, xcode,CurrDateTime)
     #trad_record.DoSummsry()

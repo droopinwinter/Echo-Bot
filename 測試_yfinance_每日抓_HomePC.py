@@ -12,7 +12,11 @@ import warnings
 import sys
 
 def ClearAnalysHour( xTicker1):               
-    SqlMaxDate = pd.read_sql(cmd.SLastHour(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+    Arr_date = pd.read_sql(cmd.SLastHour(yTicker), db.eng_Stock)
+    if len(Arr_date) >=1 :
+        SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
+    else:
+        SqlMaxDate = datetime.timedelta(days = -500)       
     db.cur_Stock.execute( cmd.DelLastHour(yTicker, SqlMaxDate) )
     db.con_Stock.commit()
     db.cur_Stock.execute( cmd.DelDupHour(yTicker) )
@@ -20,11 +24,16 @@ def ClearAnalysHour( xTicker1):
 
 
 def ClearAnalysDay( xTicker1):                       
-    SqlMaxDate = pd.read_sql(cmd.SLastDay(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+    Arr_date = pd.read_sql(cmd.SLastDay(yTicker), db.eng_Stock)
+    if len(Arr_date) >=1 :
+        SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
+    else:
+        SqlMaxDate = datetime.timedelta(days = -1000)      
     db.cur_Stock.execute( cmd.DelLastDay(yTicker, SqlMaxDate) )
     db.con_Stock.commit()
     db.cur_Stock.execute( cmd.DelDupDay(yTicker) )
     db.con_Stock.commit()     
+    
     
 try:
     warnings.simplefilter(action="ignore", category=FutureWarning)
