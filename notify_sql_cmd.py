@@ -18,7 +18,8 @@ def Sig2BuySell( befDate, countyr):
         IfTw = "and right([xremark], 3) <> '.TW'"  
         mark    = "substring([xremark],4,5)"  
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"  
-    return f"SELECT distinct [date],left(TYP,3) TYP,[buySig] buy,[SellSig] Sell,[OscSum] Osc,[xmacd] MACD ,{mark} STK"+\
+    #return f"SELECT distinct [date],left(TYP,3) TYP,[buySig] buy,[SellSig] Sell,[OscSum] Osc,[xmacd] MACD ,{mark} STK"+\
+    return f"SELECT distinct [date],left(TYP,3) TYP,[buySig] buy,[SellSig] Sell,[xmacd] MACD ,{mark} STK"+\
     f" FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] "+\
     f" where date {dateR} AND ( buySig <>0 or SellSig <> 0) {IfTw} order by date,typ "
 

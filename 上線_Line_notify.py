@@ -77,18 +77,18 @@ if len(sys.argv) >=2:
       befDay = '1'
       
 cmd.DelDupDay(country)
-stitle = "類別 布林 擺盪 多空 持倉 \n"+"        帶限 極限 趨勢 狀態 品種\n"
-sBuyTitle = "類別 進場 出場 擺盪 多空 \n"+"        信號 信號 極限 趨勢 品種\n"
-sLimiTitle = "類別 布林 擺盪 \n"+"        帶限 信號 極限 品種\n"
+stitle = " 類  布林 擺盪 多空 持倉 \n"+ " 別  帶限 極限 趨勢 狀態  品種\n"
+sBuyTitle = "                              多空\n"+"類別 進出場信號  趨勢   品種\n"
+sLimiTitle = "類別 布林 擺盪 \n"+"        帶限 極限 品種\n"
 '''
 "類別 布林 擺盪 多空 持倉 \n"+
 "        帶限 極限 趨勢 狀態 品種\n"
 
-"類別 進場 出場 擺盪 多空 \n"+
-"        信號 信號 極限 趨勢 品種\n"
+"                     多空 品種\n"+
+"類別 進場信號 出場信號 趨勢 品種\n"
 
-"類別 布林 擺盪 \n"+
-"        帶限 信號 極限 品種\n"
+" 類  布林 擺盪 多空 持倉 \n"+
+" 別  帶限 極限 趨勢 狀態  品種\n"
 '''
 try:
    if country == 'TW':      
@@ -96,32 +96,30 @@ try:
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
-         lineNotify("股指_前22個\n"+stitle+ msg5)
+         lineNotify("\n日期 : "+ sToday+"\n股指_前22個\n"+stitle+ msg5)
       
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("基金_共22個\n"+stitle+ msg5)  
+         lineNotify("\n日期 : "+ sToday+"\n基金_共22個\n"+stitle+ msg5)  
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("其他＿共22個\n"+stitle+ msg5)                     
+         lineNotify("\n日期 : "+ sToday+"\n其他＿共22個\n"+stitle+ msg5)                     
    else:
       NotifyComm(befDay, sToday, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
-         lineNotify("股指_前22\n"+stitle+ msg5)
+         lineNotify("\n日期 : "+ sToday+"\n股指_前22\n"+stitle+ msg5)
       
       
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("大科技&其他\n"+stitle+ msg5)  
+         lineNotify("\n日期 : "+ sToday+"\n大科技&其他\n"+stitle+ msg5)  
       '''
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("_大科技＿共11個\n"+msg5)   
       '''
-      
-         
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
     print('連線SQL發生錯誤-' , errMsg)
 
