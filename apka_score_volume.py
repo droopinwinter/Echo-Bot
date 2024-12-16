@@ -3,24 +3,27 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import talib
+'''
+評分艾爾德脈衝系統EMA參數 2 13*3 26*3
+2 :vap2>0 and vap3>0  and (vap1<0 第2天)
+1 :vap2>0 and vap3>0  and (vap1<0 第1天)
+0 :
+-1 : vap2<0 and vap3<0  and (vap1>0 第1天)
+-2 : vap2<0 and vap3<0  and (vap1>0 第2天)                       
+############################################    
+評分emavol參數 5 10 20 'emavol1','emavol2','emavol3','close','vol2pri','volume'
+2 : (emavol1 > emavol2 > emavol3) and (ema1 < ema2 < ema3) and (volume > emavol3*1.5) 
+1 : (emavol1 > emavol2 > emavol3) and (ema1 < ema2 < ema3) 
+0 :
+-1 : (emavol1 > emavol2 > emavol3) and (ema1 < ema2 < ema3) 
+-2 : (emavol1 < emavol2 < emavol3) and (ema1 > ema2 > ema3) and (volume > emavol3*1.1)
 
+'''
 def score_volume( data ):
-    df = data 
-    data.columns = ['Date','Volacu','Vap1','Vap2','Close','Vap3','Volume']
-    for j in range(1,len(data)):
+    xapka = pd.DataFrame() 
+    for j in range(10,len(data)):
         try:
-            data.at[j,'Volacu'] =data.at[j,"Volume"]*(data.at[j,"Close"] - data.at[j-1,"Close"])
+            if data.at[j, 'vap1'] < 0 and  data.at[j, 'vap2'] > 0 and data.at[j, 'vap2'] > 0:
+
         except Exception as errMsg: 
             print('每K線計算發生錯誤-', str(data.at[j,'date']) , errMsg)                   
-
-    data['Vap1'] = talib.EMA(data['Volacu'], timeperiod=2)
-    data['Vap2'] = talib.EMA(data['Volacu'], timeperiod=13)
-    data['Vap3'] = talib.EMA(data['Volacu'], timeperiod=26)
-    data =data.drop(columns=["Close", "Volume"])
-    df.columns   = ['Date','EmaVol1','EmaVol2','EmaVol3','Close','Vol2Pri','Volume']
-    df['EmaVol1'] = talib.EMA(data['Volume'], timeperiod=5)
-    df['EmaVol2'] = talib.EMA(data['Volume'], timeperiod=10)
-    df['EmaVol3'] = talib.EMA(data['Volume'], timeperiod=20)
-    df =df.drop(columns=["Close"])
-    data = pd.merge( data, df)
-    return data
