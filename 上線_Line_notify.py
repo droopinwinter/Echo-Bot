@@ -24,6 +24,23 @@ def lineNotify(msg):
     requests.post(url, headers=headers, data=data)
     time.sleep(1)
 
+def read_sql1(SqlStr, engine):
+   sProfTitle = '          交易\n'+\
+                '品種    次數  利潤\n'#'品種 交易次數 利潤\n'
+   df = pd.read_sql(SqlStr, engine)
+   if len(df) == 0 :
+      return ''
+   else:
+      Sdate = df.at[10,"StartDate"]
+      Edate = df.at[10,"EndDate"]
+      df =df.drop(columns=["StartDate","EndDate"])
+      df = cv.USdf2Chtext(df)
+      df["STK"] = df["STK"].str.ljust(min(len(df["profit"]), 10))
+      #df["profit"] = df["profit"].str.pad( min(len(df["profit"]), 6), side='right')
+      #df[""] = df[""].str.zfill(6)  
+      StrData = df.to_string(index=False,header=False)
+      return "起使日期_"+Sdate.strftime("%Y-%m-%d") +"\n結束日期"+Edate.strftime("%Y-%m-%d")+"\n"+sProfTitle+StrData
+
 def read_sql(SqlStr, engine):
    Ticker = pd.read_sql(SqlStr, engine)
    Ticker =Ticker.drop(columns=["date"])
@@ -31,27 +48,29 @@ def read_sql(SqlStr, engine):
    Ticker = cv.USdf2Chtext(Ticker)
    for col in Ticker.columns:
       Ticker[col] = Ticker[col].astype(str)
-      Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 4), side='left')
+      #Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 4), side='left')
+      Ticker[col] = Ticker[col].str.rjust(4)
       if col == 'STK':
-         Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 12), side='right')
+         Ticker[col] = Ticker[col].str.ljust(min(len(Ticker[col]), 5))
       if col == 'TYP':
          Ticker[col] = Ticker[col].str.pad( min(len(Ticker[col]), 1), side='left')
       '''
-      if col == 'BB':
-         Ticker[col] = Ticker[col].str.zfill(6)     
+      if col == 'OSC':
+         Ticker[col] = Ticker[col].str.rjust(2)      
+      if col == 'MCD':
+         Ticker[col] = Ticker[col].str.rjust(2)    
       if col == 'Sta':
          Ticker[col] = Ticker[col].str.zfill(6)                
-      
       if col == 'SellSig':
          Ticker = cv.SellSigdf2Chtext(Ticker)         
       '''
-   StrDate = Ticker.to_string(index=False,header=False)
+   StrData = Ticker.to_string(index=False,header=False)
    #for col in Ticker.columns:
    #  Ticker[col] = Ticker[col].str.pad(min(len(Ticker[col]), 4), side='both') # 填充到指定长度，不足则右对齐    
    if len(Ticker) == 0 :
       return ''
    else:
-      return StrDate
+      return StrData
 
 def NotifyComm(ybefDay,yStrDate,ycountry):         
    msg1 = read_sql(cmd.Sig2BuySell(ybefDay,ycountry), db.eng_apka)
@@ -78,8 +97,9 @@ if len(sys.argv) >=2:
       
 cmd.DelDupDay(country)
 stitle = " 類  布林 擺盪 多空 持倉 \n"+ " 別  帶限 極限 趨勢 狀態  品種\n"
-sBuyTitle = "                              多空\n"+"類別 進出場信號  趨勢   品種\n"
+sBuyTitle = "                            多空\n"+"類別 進出場信號  趨勢   品種\n"
 sLimiTitle = "類別 布林 擺盪 \n"+"        帶限 極限 品種\n"
+
 '''
 "類別 布林 擺盪 多空 持倉 \n"+
 "        帶限 極限 趨勢 狀態 品種\n"
@@ -97,21 +117,22 @@ try:
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
          lineNotify("\n日期 : "+ sToday+"\n股指_前22個\n"+stitle+ msg5)
-      
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("\n日期 : "+ sToday+"\n基金_共22個\n"+stitle+ msg5)  
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
-         lineNotify("\n日期 : "+ sToday+"\n其他＿共22個\n"+stitle+ msg5)                     
+         lineNotify("\n日期 : "+ sToday+"\n其他＿共22個\n"+stitle+ msg5)
+      if xToday.day == 1 or xToday.day == 15 :
+         msg5 = read_sql1(cmd.TradeProfit1M( 3,country), db.eng_trade)
+         if msg5 !='':
+            lineNotify("\n日期 : "+ sToday+"\n一年內交易績效排序\n"+ msg5)
    else:
       NotifyComm(befDay, sToday, country)
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part1(befDay,country), db.eng_apka)
       if msg5 !='':
          #lineNotify( "\n日期 : "+ StrDate + manual)
          lineNotify("\n日期 : "+ sToday+"\n股指_前22\n"+stitle+ msg5)
-      
-      
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("\n日期 : "+ sToday+"\n大科技&其他\n"+stitle+ msg5)  
@@ -120,6 +141,10 @@ try:
       if msg5 !='':
          lineNotify("_大科技＿共11個\n"+msg5)   
       '''
+      if xToday.day == 1 or xToday.day == 15 :
+         msg5 = read_sql1(cmd.TradeProfit1M( 3,country), db.eng_trade)
+         if msg5 !='':
+            lineNotify("\n日期 : "+ sToday+"\n一年內交易績效排序\n"+ msg5)      
 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
     print('連線SQL發生錯誤-' , errMsg)
 

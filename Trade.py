@@ -183,15 +183,19 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt):
     mtime_string = datetime.fromtimestamp(int(mtime))
     b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
     TredProfit = pd.concat([TredProfit, pd.DataFrame([b])], ignore_index=True)
-    TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit", "CreatDate"]
+    if len(TredProfit) >0:
+        TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit", "CreatDate"]
     #TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
-    TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
+    if len(TredRoc) > 0:
+        TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
     ##############################################################################################
     CurrDateTime = datetime.now()
-    if CurrDateTime.day == 1 :
+    if CurrDateTime.day == 1 or CurrDateTime.day == 15:
         try:
-            TredProfit.to_sql( 'TrateProf',db.eng_trade,if_exists='append', index=False)
-            TredRoc.to_sql( 'TrateRec_'+Ticker,db.eng_trade,if_exists='append', index=False)        
+            if len(TredProfit) >0:
+                TredProfit.to_sql( 'TrateProf1',db.eng_trade,if_exists='append', index=False)
+            if len(TredRoc) > 0:
+                TredRoc.to_sql( 'TrateRec_'+Ticker,db.eng_trade,if_exists='append', index=False)        
             #print(SingTredRoc)
         except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
             print('回存Trade資料庫錯誤_', Ticker , errMsg) 

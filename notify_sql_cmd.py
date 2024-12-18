@@ -124,8 +124,18 @@ def Sig2TrendAndOsc_part3( befDate, countyr):
         mark    = "substring([xremark],4,5)"  
         range   = "'22' and '40'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],[buy] Sta,[BBlevel] BB,[OscSum] OSC,[xmacd] MCD,[mark] STK FROM ( "+\
-      "  SELECT distinct [date],[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
+    return "SELECT [date],TYP,[buy] Sta,[BBlevel] BB,[OscSum] OSC,[xmacd] MCD,[mark] STK FROM ( "+\
+      "  SELECT distinct [date],TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR}  {IfTw} "+\
       f" and left([xremark], 2) between {range} ) a order by typ,pre "
+
+#=================================================
+# 每月1日列出交易績效
+def TradeProfit1M( xDate,country):
+    if country == 'TW':
+        IfTw = "and right([Ticker], 3) = '.TW'"
+    else:
+        IfTw = "and right([Ticker], 3) <> '.TW'"
+    return "SELECT distinct [Ticker] STK,[StartDate] ,[EndDate] ,[TradeCount] ,[profit] "+\
+          f"FROM [trade].[dbo].[TrateProf] WHERE [CreatDate] > GETDATE()-{xDate} {IfTw} order by [profit] desc"

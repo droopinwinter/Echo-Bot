@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import talib
 '''
 評分艾爾德脈衝系統EMA參數 2 13*3 26*3
-2 :vap2>0 and vap3>0  and (vap1<0 第2天)
-1 :vap2>0 and vap3>0  and (vap1<0 第1天)
+2 :vap2>0 and vap3>0 and vap2(0)>vap2(-1) and (vap1<0 第2天)
+1 :vap2>0 and vap3>0 and vap2(0)>vap2(-1) and (vap1<0 第1天)
 0 :
--1 : vap2<0 and vap3<0  and (vap1>0 第1天)
--2 : vap2<0 and vap3<0  and (vap1>0 第2天)                       
+-1 : vap2<0 and vap3<0 and vap2(0)<vap2(-1) and (vap1>0 第1天)
+-2 : vap2<0 and vap3<0 and vap2(0)<vap2(-1) and (vap1>0 第2天)                       
 ############################################    
 評分emavol參數 5 10 20 'emavol1','emavol2','emavol3','close','vol2pri','volume'
 2 : (emavol1 > emavol2 > emavol3) and (ema1 < ema2 < ema3) and (volume > emavol3*1.5) 
