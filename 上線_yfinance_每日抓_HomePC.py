@@ -38,6 +38,7 @@ def ClearAnalysDay( xTicker1):
 try:
     warnings.simplefilter(action="ignore", category=FutureWarning)
     CurrDate = datetime.now().strftime("%Y-%m-%d")
+    Bef3YerDate = datetime.now()  - timedelta(days=1000)
     sql_cmd = cmd.s_Stock_Ticker
     if len(sys.argv) >=2:
         if sys.argv[1] == 'TW':
@@ -60,8 +61,11 @@ try:
         '''
         #日K
         db.cur_Stock.execute( cmd.DelDupDay(yTicker) )
-        db.con_Stock.commit()                        
-        SqlMaxDate = pd.read_sql(cmd.SLastDay(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        db.con_Stock.commit()
+        try:
+            SqlMaxDate = pd.read_sql(cmd.SLastDay(yTicker), db.eng_Stock).iat[0, 0].strftime("%Y-%m-%d")
+        except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+            SqlMaxDate = Bef3YerDate.strftime("%Y-%m-%d")                        
         db.cur_Stock.execute( cmd.DelLastDay(yTicker, SqlMaxDate) )
         db.con_Stock.commit()
         yf.download(yTicker,start = SqlMaxDate, end=CurrDate,interval='1d').to_sql( 'RowDay_'+yTicker,db.eng_Stock,if_exists='append', index=True)        

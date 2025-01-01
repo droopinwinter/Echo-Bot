@@ -21,15 +21,19 @@ def ClearAnalysHour( xTicker1,):
     return SqlMaxDate
 
 def ClearAnalysDay( xTicker1,):
-    SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
-    db.cursor_analsy.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
-    db.conn_analsy.commit()    
-    db.cursor_analsy.execute(cmd.DelDupDay( xTicker1) )
-    db.conn_analsy.commit()
+    try:
+        SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+        db.cursor_analsy.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
+        db.conn_analsy.commit()    
+        db.cursor_analsy.execute(cmd.DelDupDay( xTicker1) )
+        db.conn_analsy.commit()
+    except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+        Bef3YerDate = datetime.now() - timedelta(days=1000)
+        SqlMaxDate =  Bef3YerDate.strftime("%Y-%m-%d")       
     return SqlMaxDate
 
 stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.TW','00640L.TW','00635U.TW','00693U.TW','00763U.TW','00683L.TW','00663L.TW','00709.TW','00660.TW','00682U.TW']
-
+stk_list1 = ['SVIX']
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
     pd_TechAnalysis = pd.read_sql(cmd.s_Stock_TechAnalysis, db.eng_Stock)

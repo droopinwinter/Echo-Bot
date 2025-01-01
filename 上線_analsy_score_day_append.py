@@ -20,6 +20,7 @@ import sys
 
 
 stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.TW','00640L.TW','00635U.TW','00693U.TW','00763U.TW','00683L.TW','00663L.TW','00709.TW','00660.TW','00682U.TW']
+#stk_list1 = ['SVIX']
 
 def ClearApkaDay( xTicker1):
     #SqlMaxDate = '2023-12-22'
@@ -60,8 +61,12 @@ for i in Ticker.Stock:
 #for i in stk_list1:
     xcode = i.strip()    
     print('apka_每日分析_'+xcode.strip())
-    SqlMaxDate = ClearApkaDay(xcode)
-    #SqlMaxDate = '2022-11-21'
+    try:
+        SqlMaxDate = ClearApkaDay(xcode)
+    except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+        SqlMaxDate = Bef1YerDate.strftime("%Y-%m-%d")
+    
+    #
     #==========================================
     sql3 = cmd.sqlCommand( xcode.strip() ,4, Bef1YerDate)
     #==========================================
