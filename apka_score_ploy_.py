@@ -80,3 +80,45 @@ def plot(xapka, xcode):
     plt.savefig('..\\PlotImg\\'+xcode+ StrTime+'.png')
     #plt.show()
     
+def plot_vol(xapka, xcode):
+    #xapka.columns = ["date", "close", "plse"]
+    #print(xapka.head())
+    
+    fig = plt.figure(num =1, figsize=(18,9))    #創建圖表
+    sub1 = fig.add_subplot(2, 1, 1) # 添加子圖表1
+    sub2 = fig.add_subplot(2, 1, 2) # 添加子圖表2
+    #sub3 = fig.add_subplot(3, 1, 3) # 添加子圖表2
+    sub1.plot(xapka["date"],xapka["close"],  label=xcode  ,color = 'blue') 
+    #sub1.plot(xapka["date"],xapka["close"] + 20*xapka["xmacd"]  ,  label="xmacd"   , linewidth = 1, linestyle = '--',color = 'teal')
+    sub1.grid()
+    sub1.legend(loc =2)
+    t = datetime.now()
+    StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
+    #plt.title('Ticker='+xcode+StrTime) 
+    sub2.plot(xapka["date"],xapka["plse"],   label="plse"    , linewidth = 0.5, linestyle = '-' ,color = 'red') 
+
+    for i in range(1,len(xapka)):
+        Yaxis   = xapka.at[i, "close"]
+        Xaxis   = xapka.at[i, "date"]
+        Xbuy    = xapka.at[i, "plse"]
+        Pbuy    = xapka.at[i-1, "buy"]
+        Xclose  = str(xapka.at[i, "close"].round(2))
+        Xprofit = str( xapka.at[i,"profit"].round(3))
+        if xapka.at[i,"plse"] >=2 :
+            Yaxis =  Yaxis*0.99
+            sub1.text(Xaxis, Yaxis,str(Xbuy)+'_'+str(Xaxis)[5:10]+'\n'+Xclose,rotation=90,color='red')
+            #sub2.text(Xaxis,-5   ,str(Pbuy)+'_'+str(Xaxis)[5:10]+'\n'+Xclose+'_'+Xprofit,color='sienna')
+
+
+    ## 設定x軸和y軸的範圍空間
+    #plt.xlim((-1, 2.5))
+    ## 設定x軸與y軸標籤名稱
+    #plt.xticks(xapka["date"])
+    
+    plt.subplots_adjust(left=0.05,bottom=0.07,right=0.97,top=0.97,wspace=0.12,hspace=0.12)
+    plt.grid() 
+    plt.legend()
+    plt.tight_layout(rect=(1,1,1,1))
+    plt.savefig('..\\PlotImg\\'+xcode+ StrTime+'.png')
+    #plt.show()
+    
