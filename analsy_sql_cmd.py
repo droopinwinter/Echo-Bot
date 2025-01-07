@@ -40,7 +40,7 @@ def sqlCommand( xcode, kind, Bef1YerDate):
     elif kind ==5:#Bef1YerDate.strftime("%Y-%m-%d, %H:%M:%S")
         sql = BaseSql +f"[AnalysDay_{xcode}] order by date "#between '2021-05-03 00:00:00.000' and '2022-05-03 00:00:00.000' "                  
     elif kind ==6:#Bef1YerDate.strftime("%Y-%m-%d, %H:%M:%S")
-        sql = BaseSq2 +f"[AnalysDay1_{xcode}] WHere date > '"+Bef1YerDate.strftime("%Y-%m-%d %H:%M:%S") +"' order by date " 
+        sql = BaseSq2 +f"[AnalysDay_{xcode}] WHere date > '"+Bef1YerDate.strftime("%Y-%m-%d %H:%M:%S") +"' order by date " 
     else:
         sql = f"select  distinct [date],[open],[high],[low],[close],[colume],[fastk_d],[fastd_d],[fastk_w],[fastd_w],[fastk_m],[fastd_m],[willrd],[willrw],[willrm],\
                 [MACD_d],[signal_d],[histg_d],[MACD_w],[signal_w],[histg_w],[MACD_m],[signal_m],[histg_m],[upp_d],[mid_d],[low_d],[upp_w],[mid_w],[low_w],[upp_m],[mid_m],[low_m],\

@@ -1,3 +1,4 @@
+#analsy_score_day_append_HomePC.py
 import pymssql
 from sqlalchemy import create_engine
 from datetime import datetime
@@ -57,12 +58,14 @@ if len(sys.argv) >=2:
         Country = 'TW'
 cmd.DelDupDay_Combin(Country)        
 Ticker = pd.read_sql(sql_cmd, db.eng_Stock)
-#for i in Ticker.Stock:
-for i in stk_list:
+for i in Ticker.Stock:
+#for i in stk_list:
     xcode = i.strip()    
     print('apka_每日分析_'+xcode)
-    #SqlMaxDate = ClearApkaDay(xcode)
-    SqlMaxDate = '2022-11-21'
+    try:
+        SqlMaxDate = ClearApkaDay(xcode)
+    except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+        SqlMaxDate = Bef1YerDate.strftime("%Y-%m-%d")
     #==========================================
     sql3 = cmd.sqlCommand( xcode ,6, Bef1YerDate)
     #==========================================
@@ -101,8 +104,8 @@ for i in stk_list:
     apkaCom = pd.merge( apkaCom, apkaefi)
     apkan9 =apka_score_volume.score_nime(data)
     apkaCom = pd.merge( apkaCom, apkan9)    
-    apka_score_ploy.plot_vol(apkaCom, xcode,CurrDateTime)
-    '''
+    #apka_score_ploy.plot_vol(apkaCom, xcode,CurrDateTime)
+    
     SingTredRoc = Trade.TotProfit(apkaCom, xcode, CurrDateTime,1)
     SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+SqlMaxDate+" 00:00:00.000'"]
     try:
@@ -120,7 +123,7 @@ for i in stk_list:
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         print('回存apka資料庫錯誤_', xcode , errMsg)   
     
-    '''
+    
 
     
 

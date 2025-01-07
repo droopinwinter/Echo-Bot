@@ -1,3 +1,4 @@
+#上線_analsy_score_day_append.py
 import pymssql
 from sqlalchemy import create_engine
 from datetime import datetime
@@ -12,6 +13,7 @@ import apka_count_EMA
 import apka_score_trend
 import apka_score_oscillate
 import analsy_score_xcom
+import apka_score_volume
 import Trade
 import trad_record
 import analsy_sql_cmd as cmd
@@ -19,8 +21,7 @@ import conn_db as db
 import sys
 
 
-stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.TW','00640L.TW','00635U.TW','00693U.TW','00763U.TW','00683L.TW','00663L.TW','00709.TW','00660.TW','00682U.TW']
-#stk_list1 = ['SVIX']
+stk_list = ['SPY']
 
 def ClearApkaDay( xTicker1):
     #SqlMaxDate = '2023-12-22'
@@ -58,17 +59,15 @@ if len(sys.argv) >=2:
 cmd.DelDupDay_Combin(Country)        
 Ticker = pd.read_sql(sql_cmd, db.eng_Stock)
 for i in Ticker.Stock:
-#for i in stk_list1:
+#for i in stk_list:
     xcode = i.strip()    
-    print('apka_每日分析_'+xcode.strip())
+    print('apka_每日分析_'+xcode)
     try:
         SqlMaxDate = ClearApkaDay(xcode)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         SqlMaxDate = Bef1YerDate.strftime("%Y-%m-%d")
-    
-    #
     #==========================================
-    sql3 = cmd.sqlCommand( xcode.strip() ,4, Bef1YerDate)
+    sql3 = cmd.sqlCommand( xcode ,6, Bef1YerDate)
     #==========================================
     data = pd.read_sql(sql3, db.eng_analsy, parse_dates=True)
     data.columns = ["date","open","high","low","close","colume",\
@@ -76,12 +75,12 @@ for i in Ticker.Stock:
                     "willrd","willrw","willrm",\
                     "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                     "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
-                    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]
-
+                    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
+                    "vap1","vap2","vap3","emavol1","emavol2","emavol3","vol2pri","volume"] 
     data.replace("Zero", 0)
     #data.set_index("date" , inplace=True)
     #print('Ticker='+xcode)
-    #apka_count_EMA.score_EMA(data) 
+    #apka_count_EMA.score_EMA(data)
     apkaTre = apka_score_trend.score_trend(data)
     apkaTre =apkaTre.drop(columns=["buy", "sell", "profit"])
     apkaOsc = apka_score_oscillate.score_oscillate(data)
@@ -101,6 +100,12 @@ for i in Ticker.Stock:
     cmb = analsy_score_xcom.score_xcom(apkaCom)
     apkaCom = pd.merge( apkaCom, cmb)    
     
+    apkaefi =apka_score_volume.score_pulse(data)
+    apkaCom = pd.merge( apkaCom, apkaefi)
+    apkan9 =apka_score_volume.score_nime(data)
+    apkaCom = pd.merge( apkaCom, apkan9)    
+    #apka_score_ploy.plot_vol(apkaCom, xcode,CurrDateTime)
+    
     SingTredRoc = Trade.TotProfit(apkaCom, xcode, CurrDateTime,1)
     SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+SqlMaxDate+" 00:00:00.000'"]
     try:
@@ -117,6 +122,8 @@ for i in Ticker.Stock:
         #print(SingTredRoc)
     except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
         print('回存apka資料庫錯誤_', xcode , errMsg)   
+    
+    
 
     
 
@@ -128,5 +135,5 @@ for i in Ticker.Stock:
     #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
     #trad_record.DoSummsry(TotTredRoc, CurrDateTime)
     #TotTredRoc.to_sql('TradeRecord1',engine3,if_exists='append', index=False)
-    #apka_score_ploy.plot(apkaCom, xcode.strip(),CurrDateTime)
+    #apka_score_ploy.plot(apkaCom, xcode,CurrDateTime)
     #trad_record.DoSummsry()
