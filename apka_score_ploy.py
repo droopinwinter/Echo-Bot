@@ -123,17 +123,19 @@ def plot_vol(xapka, xcode, CurrDateTime):
     for i in range(1,len(xapka)):
         Yaxis   = xapka.at[i, "close"]
         Xaxis   = xapka.at[i, "date"]
-        Xbuy    = xapka.at[i, "plse"]
-        Pbuy    = xapka.at[i, "count9"]
+        Xbuy    = xapka.at[i, "plse"]+xapka.at[i, "xmacd"]
+        Xbuy_1    = xapka.at[i-1, "plse"]+xapka.at[i-1, "xmacd"]
+        #Pbuy    = xapka.at[i, "count9"]
         sPrice  = xapka.at[0, "close"]
-        if xapka.at[i,"plse"] ==2 :
+        if Xbuy >0 and Xbuy_1 <=0:
             Yaxis =  Yaxis*0.99
             plt.text(Xaxis, sPrice,'*',rotation=90,color='red')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='red')
-        elif xapka.at[i,"plse"] ==-2 :
+        elif Xbuy <0 and Xbuy_1 >=0:
             Yaxis =  Yaxis*1.01
             plt.text(Xaxis,sPrice,'#',rotation=90,color='blue')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='blue')
+        '''
         elif xapka.at[i,"count9"] >=8:
             Yaxis =  Yaxis*1.01            
             plt.text(Xaxis,sPrice,str(xapka.at[i,"count9"]),rotation=90,color='black')
@@ -142,6 +144,8 @@ def plot_vol(xapka, xcode, CurrDateTime):
             Yaxis =  Yaxis*0.99
             plt.text(Xaxis,sPrice,str(xapka.at[i,"count9"]),rotation=90,color='sienna')
             plt.plot([Xaxis,Xaxis], [sPrice, Yaxis],color='sienna')
+        
+        '''
 
     plt.subplot(2, 1, 2) # 添加子圖表2 #["date", "close", "xsrsi", "xwillrd", "xBBand", "OscSum", "BBlevel","buy", "sell", "profit"]
     #plt.plot(xapka["date"],xapka["xcmb"],   label="xcmb"    , linewidth = 1, linestyle = '-' ,color = 'red') 
@@ -149,25 +153,32 @@ def plot_vol(xapka, xcode, CurrDateTime):
     #plt.plot(xapka["date"],xapka["xsrsi"],  label="xsrsi"   , linewidth = 1, linestyle = '--',color = 'sienna')
     #plt.plot(xapka["date"],xapka["xwillrd"]+3,  label="xwillrd"   , linewidth = 1, linestyle = '--',color = 'red')
     #plt.plot(xapka["date"],xapka["xBBand"]+6,  label="xBBand"   , linewidth = 1, linestyle = '--',color = 'teal')
-    plt.plot(xapka["date"],xapka["count9"],  label="count9"   , linewidth = 2, linestyle = '--',color = 'red')
-    plt.plot(xapka["date"],xapka["plse"],  label="plse"   , linewidth = 1, linestyle = '--',color = 'black')
+    
+    #plt.plot(xapka["date"],xapka["count9"],  label="cnt9"   , linewidth = 2, linestyle = '--',color = 'brown')
+    plt.plot(xapka["date"],xapka["plse"]+xapka["xmacd"],  label="plse"   , linewidth = 1, linestyle = '--',color = 'black')
+    plt.plot(xapka["date"],xapka["xmacd"],  label="plse"   , linewidth = 1, linestyle = '--',color = 'red')
+    plt.plot(xapka["date"],xapka["plse"],  label="plse"   , linewidth = 1, linestyle = '--',color = 'blue')
     #sub2.plot(xapka["date"],xapka["xsrsi"],  label="xsrsi"   , linewidth = 1,linestyle = '-',color = 'brown') 
     #sub2.plot(xapka["date"],xapka["xwillrd"],label="xwillrd" , linewidth = 1,linestyle = '--',color = 'black')  
     
     for i in range(1,len(xapka)):
         Xaxis   = xapka.at[i, "date"]
-        if xapka.at[i,"plse"] >=0 :
+        if xapka.at[i,"plse"] >=2 :
             plt.text(Xaxis, xapka.at[i,"plse"]    ,str(xapka.at[i,"plse"])+'_'+str(Xaxis)[5:10],rotation=90,color='red')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='red')
-        elif xapka.at[i,"plse"] <=0 :
+        elif xapka.at[i,"plse"] <=-2 :
             plt.text(Xaxis,xapka.at[i,"plse"] ,str(xapka.at[i,"plse"])+'_'+str(Xaxis)[5:10],rotation=90,color='blue')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='blue')
-        elif xapka.at[i,"count9"] <=-8 :
-            plt.text(Xaxis,xapka.at[i,"count9"]    ,str(xapka.at[i,"count9"])+'_'+str(Xaxis)[5:10],rotation=90,color='black')
+        '''
+        if xapka.at[i,"count9"] ==-7 :
+            plt.text(Xaxis,xapka.at[i,"count9"] ,str(Xaxis)[5:10],rotation=90,color='black')
             plt.plot([Xaxis,Xaxis], [-6, -4],color='black')
-        elif xapka.at[i,"count9"] >=8 :
-            plt.text(Xaxis,xapka.at[i,"count9"] ,str(xapka.at[i,"count9"])+'_'+str(Xaxis)[5:10],rotation=90,color='sienna')
-            plt.plot([Xaxis,Xaxis], [-6, -4],color='sienna')
+        elif xapka.at[i,"count9"] ==7 :
+            plt.text(Xaxis,xapka.at[i,"count9"] ,str(Xaxis)[5:10],rotation=90,color='sienna')
+            plt.plot([Xaxis,Xaxis], [-6, -4],color='sienna')        
+        '''
+
+        
     
 
 

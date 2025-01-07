@@ -22,11 +22,15 @@ def ClearAnalysHour( xTicker1,):
     return SqlMaxDate
 
 def ClearAnalysDay( xTicker1,):
-    SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
-    db.cursor_analsy.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
-    db.conn_analsy.commit()    
-    db.cursor_analsy.execute(cmd.DelDupDay( xTicker1) )
-    db.conn_analsy.commit()
+    try:
+        SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_analsy).iat[0, 0].strftime("%Y-%m-%d")
+        db.cursor_analsy.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
+        db.conn_analsy.commit()    
+        db.cursor_analsy.execute(cmd.DelDupDay( xTicker1) )
+        db.conn_analsy.commit()
+    except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+        Bef3YerDate = datetime.now() - timedelta(days=1000)
+        SqlMaxDate =  Bef3YerDate.strftime("%Y-%m-%d")       
     return SqlMaxDate
 
 stk_list = ['00681R.TW']
@@ -48,7 +52,7 @@ try:
         try:
             #SRSI
             SqlMaxDate = ClearAnalysDay( yTicker)
-            #SqlMaxDate = '2023-11-21'
+            #SqlMaxDate = '2020-11-21'
             #SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             data       = pd.read_sql(cmd.SPeriodDay( yTicker,SqlMinDate), db.eng_Stock, parse_dates=True)
@@ -72,7 +76,7 @@ try:
             data = pd.merge( data, analsyVol)
 
             try:          
-                #data = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
+                data = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
                 data.reset_index(drop=True)
                 data.columns = ["date","open","high","low","close","adjclose","colume",\
                         "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m","willrd","willrw","willrm",\

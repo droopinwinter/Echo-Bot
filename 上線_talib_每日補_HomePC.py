@@ -10,6 +10,7 @@ import talib
 from talib import abstract
 import conn_db as db
 import talib_sql_cmd as cmd
+import analsy_volume
 import sys
 
 def ClearAnalysHour( xTicker1,):
@@ -32,8 +33,8 @@ def ClearAnalysDay( xTicker1,):
         SqlMaxDate =  Bef3YerDate.strftime("%Y-%m-%d")       
     return SqlMaxDate
 
-stk_list1 = ['00642U.TW','00645.TW','00661.TW','00685L.TW','00738U.TW','00708L.TW','00640L.TW','00635U.TW','00693U.TW','00763U.TW','00683L.TW','00663L.TW','00709.TW','00660.TW','00682U.TW']
-stk_list1 = ['SVIX']
+stk_list = ['00681R.TW']
+
 try:
     # 初始化数据库连接引擎 create_engine("数据库类型+数据库驱动://数据库用户名:数据库密码@IP地址:端口/数据库"，其他参数
     pd_TechAnalysis = pd.read_sql(cmd.s_Stock_TechAnalysis, db.eng_Stock)
@@ -45,17 +46,20 @@ try:
 
     pd_read_sql = pd.read_sql(sql_cmd, db.eng_Stock)
     for i in pd_read_sql.Stock:
-    #for i in stk_list1:
+    #for i in stk_list:
         print('talib_每日抓_'+i)
         yTicker = i.strip()
         try:
             #SRSI
             SqlMaxDate = ClearAnalysDay( yTicker)
-            #SqlMaxDate = '2023-11-21'
+            #SqlMaxDate = '2020-11-21'
             #SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             SqlMinDate = pd.read_sql(cmd.S1000StockDay(yTicker), db.eng_Stock).iat[999, 0].strftime("%Y-%m-%d")
             data       = pd.read_sql(cmd.SPeriodDay( yTicker,SqlMinDate), db.eng_Stock, parse_dates=True)
             data.columns = ["date","open", "high", "low", "close", "adj close", "colume"]
+            data1 = data
+
+
             for x in range(0,22):
                 rztcoul = pd_TechAnalysis.at[x,"RztLabel"].strip().split(',')
                 try:
@@ -68,6 +72,8 @@ try:
                     data = data.set_index('key_0')
                 except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
                     print('abstract發生錯誤-', pd_TechAnalysis.at[x,"name"] , errMsg)    
+            analsyVol = analsy_volume.analsy_volume(data1)
+            data = pd.merge( data, analsyVol)
 
             try:          
                 data = data[data["date"] >= SqlMaxDate+" 00:00:00.000"]  
@@ -76,8 +82,11 @@ try:
                         "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m","willrd","willrw","willrm",\
                         "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
                         "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
-                        "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10"]  
+                        "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
+                        "vap1","vap2","vap3","emavol1","emavol2","emavol3","vol2pri","volume"]                  
+                
                 data.to_sql( 'AnalysDay_'+yTicker,db.eng_analsy,if_exists='append', index=False)
+                #data.to_sql( 'AnalysDay1_'+yTicker,db.eng_analsy,if_exists='append', index=False)
             except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
                 print('回存資料庫錯誤_', yTicker , errMsg)    
         except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容

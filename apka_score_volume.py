@@ -79,12 +79,8 @@ def score_nime( data ):
                 lcnt=0
             if (close > close_4)  and lcnt==0:
                 lcnt =1
-            if (close > close_4) and (data.at[j-1, 'close'] > data.at[j-5, 'close']) and lcnt>0 and lcnt<9:
+            if (close > close_4) and (data.at[j-1, 'close'] > data.at[j-4, 'close']) and lcnt>0 and lcnt<9:
                 lcnt +=1
-            if lcnt ==8 or lcnt ==9:
-                cnt9 = lcnt
-            else:
-                cnt9 = 0
 
             if scnt==-9 or (close >= close_4 and scnt<0 and scnt>-8 ):
                 scnt=0
@@ -92,11 +88,15 @@ def score_nime( data ):
                 scnt =-1
             if (close < close_4) and (data.at[j-1, 'close'] < data.at[j-5, 'close']) and scnt<0 and lcnt>-9:
                 scnt -=1
-            if scnt ==-8 or scnt ==-9:
+
+            cnt9 = 0
+            if lcnt >=7 and lcnt <=9:
+                cnt9 = lcnt
+            elif scnt <=-7 and scnt >=-9:
                 cnt9 = scnt
-            else:
-                cnt9 = 0
-            a=[ data.at[j,'date'],cnt9]
+
+						
+            a=[ data.at[j,'date'], cnt9]
             c9 = pd.concat([c9, pd.DataFrame([a])], ignore_index=True)   
         except Exception as errMsg: 
             print('每K線計算錯誤-', str(data.at[j,'date']) , errMsg)
