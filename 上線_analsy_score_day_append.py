@@ -106,7 +106,7 @@ for i in Ticker.Stock:
     apkaCom = pd.merge( apkaCom, apkan9)    
     #apka_score_ploy.plot_vol(apkaCom, xcode,CurrDateTime)
     
-    SingTredRoc = Trade.TotProfit(apkaCom, xcode, CurrDateTime,1)
+    SingTredRoc = Trade.TotProfit(apkaCom, xcode, CurrDateTime,1, Country)
     SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+SqlMaxDate+" 00:00:00.000'"]
     try:
         SingTredRoc.reset_index(drop=True)      

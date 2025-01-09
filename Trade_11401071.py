@@ -1,139 +1,209 @@
-#上線_analsy_score_day_append.py
-import pymssql
-from sqlalchemy import create_engine
-from datetime import datetime
+#Trade
 import pandas as pd
-from pandas import DataFrame,Series
-from datetime import timedelta
-import matplotlib.pyplot as plt
-import numpy as np
-
-import apka_score_ploy
-import apka_count_EMA
-import apka_score_trend
-import apka_score_oscillate
-import analsy_score_xcom
-import apka_score_volume
-import Trade
-import trad_record
-import analsy_sql_cmd as cmd
+import os,sys
+from datetime import datetime
 import conn_db as db
-import sys
 
+xema    = 0.0
+xema_1  = 0.0
+yema    = 0.0
+yema_1  = 0.0
+xmacd   = 0.0
+xmacd_1 = 0.0
+OscSum  = 0.0
+OscSum_1= 0.0
+xTrnSlop= 0.0
+prebuy  = 0.0
+xBBand  = 0.0
+buyPrice=0.0
+plse    =0.0
+plse_1  =0.0
+Buydate ='2001-01-01 00:00:00.000'
 
-stk_list = ['SPY']
+def TotProfit(xapka, Ticker, CurrDateTime, rzt):
+    def curValue(i):
+        xema    = xapka.at[i,"xema"]
+        xema_1  = xapka.at[i-1,"xema"]
+        yema    = xapka.at[i,"yema"] 
+        yema_1  = xapka.at[i-1,"yema"] 
+        xmacd   = xapka.at[i,"xmacd"]
+        xmacd_1 = xapka.at[i-1,"xmacd"]
+        OscSum  = xapka.at[i,"OscSum"]
+        OscSum_1= xapka.at[i-1,"OscSum"]
+        xTrnSlop= xapka.at[i,"TrnSlop"]
+        prebuy  = xapka.at[i-1,"buy"]
+        xBBand  = xapka.at[i,"xBBand"]
+        #xplse   = xapka.at[i,"plse"]
+        #xplse_1 = xapka.at[i-1,"plse"]
+        buyPrice = xapka.at[i,"close"]
+        Buydate  = xapka.at[i, "date"]
 
-def ClearApkaDay( xTicker1):
-    #SqlMaxDate = '2023-12-22'
-    Arr_date = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_apka)
-    if len(Arr_date) >=1:
-        SqlMaxDate = Arr_date.iat[0, 0].strftime("%Y-%m-%d")
-    else:
-        SqlMaxDate = datetime.timedelta(days = -1000)    
-    #SqlMaxDate = pd.read_sql(cmd.SLastDay( xTicker1), db.eng_apka).iat[0, 0].strftime("%Y-%m-%d")
-    db.cursor_apka.execute(cmd.DelLastDay( xTicker1, SqlMaxDate) )
-    db.conn_apka.commit()    
-    db.cursor_apka.execute(cmd.DelDupDay( xTicker1) )
-    db.conn_apka.commit()
-    return SqlMaxDate
+    def Xtred(i):
+        xtred = 0
+        for j in range(1,5):
+            xtred +=(xapka.at[i-j+1,"xmacd"] - xapka.at[i-j,"xmacd"])
+        return xtred    
+            
+    def ToBuy(i, xtred):
+        if prebuy ==0:
+            if  ( OscSum==8 or (OscSum <  6 and OscSum_1 == 6 ) \
+                 or ( OscSum < 4 and OscSum_1 == 4 ) )and (xmacd <-2 or xema<-2) :
+                xapka.at[i,"buySig"] =10
+                return 10 #+極端交易
+            #elif ( OscSum < 4 and OscSum_1 == 4 ) and xmacd <=-1:
+            #    return 11 #+極端交易
+            #elif OscSum <= -6 and xmacd >=4 and xema >=4 and xTrnSlop<=0:
+            #    return -11            
+            elif  yema > yema_1  and yema >0 :#and xTrnSlop>0
+                xapka.at[i,"buySig"] =yema
+                return yema  #+GMMA交易                        
+            #elif yema < yema_1 and yema <=-1 and xema <0 and xTrnSlop<=0:
+            #    xapka.at[i,"buySig"] =yema
+            #    return yema #-GMMA交易
+            elif xmacd >0 and xmacd_1 <=0  and xTrnSlop>0:
+                xapka.at[i,"buySig"] =20
+                return 20 #+趨勢交易
+            elif  xmacd <0 and xmacd_1 >=0 and xTrnSlop<-0.1:
+                xapka.at[i,"buySig"] =-20
+                return -20            
+        else:
+            return 0
+        
+    def ToSell(i, xtred):
+        if   prebuy == 10 and (xmacd == 4 or (OscSum<=-1 and xmacd <0) )  :
+            xapka.at[i,"SellSig"] =110  
+            return prebuy #+極端交易
+        elif prebuy == 11 and OscSum == 0 :
+            xapka.at[i,"SellSig"] =111
+            return prebuy #+極端交易
+        elif prebuy == -11 and OscSum == 0 :
+            xapka.at[i,"SellSig"] =-110
+            return prebuy  #-極端交易      
+        elif prebuy < 0 and prebuy > -10 and ( yema > yema_1 or xmacd > xmacd_1):
+            xapka.at[i,"SellSig"] =prebuy-100
+            return prebuy #-GMMA交易
+        elif prebuy > 0   and prebuy < 10 and(yema < yema_1 or xmacd < xmacd_1 ): #and prebuy == yema_1
+            xapka.at[i,"SellSig"] =prebuy+100
+            return prebuy #+GMMA交易
+        elif prebuy ==20  and (OscSum <=-6 or (xmacd < xmacd_1 ) \
+                               or (xema < xema_1 ) ) :     
+            xapka.at[i,"SellSig"] =prebuy+100
+            return prebuy #+趨勢交易
+        elif prebuy ==-20  and ( OscSum >=3 or (xmacd > xmacd_1 and  xmacd<=0 ) or (xema > xema_1 and  xema <=0))  :     
+            xapka.at[i,"SellSig"] =prebuy-100
+            return prebuy        
+        else:
+            return 0
+#---------------------------------------------------------------------------
+    buyPrice = 0.0
+    BuySellway =''
+    Buydate =''
+    LongShort =''
 
-try:  
+    xapka.fillna(0)
+    #print(xapka.head())
+    TredRoc = pd.DataFrame()
+    TredProfit = pd.DataFrame()
+    for i in range(5,len(xapka)):
+        curValue(i)
+        totred = int (Xtred(i) or 0)
+        toBuy = int (ToBuy(i, totred) or 0)
+        toSell= int (ToSell(i, totred) or 0) 
+        if toBuy >= 1 :
+            xapka.at[i,"buy"] =toBuy
+            BuySellway = BuySellway +'+Buy_'+str(xema_1)[5:10]+' => ' 
+        elif toBuy <= -1 :
+            xapka.at[i,"buy"] =toBuy
+            BuySellway = BuySellway +'-Buy_'+str(xema_1)[5:10]+' => '             
+        elif toSell >= 1 :
+            #xapka.at[i,"Sell"] =1
+            xapka.at[i,"buy"] =0
+            xapka.at[i,"profit"] = (buyPrice - buyPrice)/buyPrice
+            #print(BuySellway +'Sell_'+str(xema_1)[5:10]+'_profit= '+str( xapka.at[i,"profit"].round(3)))
+            a = [Ticker, prebuy, Buydate, xema_1, round(buyPrice, 3), round(buyPrice, 3), round(xapka.at[i,"profit"],3), CurrDateTime]
+            TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
+            BuySellway =''
+        elif toSell <= -1 :
+            #xapka.at[i,"Sell"] =-1
+            xapka.at[i,"buy"] =0
+            xapka.at[i,"profit"] = (buyPrice - buyPrice)/buyPrice
+            #print(BuySellway +'Sell_'+str(xema_1)[5:10]+'_profit= '+str( xapka.at[i,"profit"].round(3)))
+            a = [Ticker, prebuy, Buydate, xema_1, round(buyPrice, 3), round(buyPrice, 3), round(xapka.at[i,"profit"], 3), CurrDateTime]
+            TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)            
+            BuySellway =''
+        else:
+            #xapka.at[i,"Sell"] = xapka.at[i-1,"Sell"]
+            xapka.at[i,"buy"]  = prebuy
+
+    EndDate = len(xapka)
+    init = total =100.0
+    count = 0
+    for i in range(1,EndDate):
+        if xapka.at[i,"profit"] != 0:
+            count = count +1
+            total = total + total*xapka.at[i,"profit"]
+    print( Ticker, "From [" + str(xapka.at[1,"date"]) +"] to ["+ str(xapka.at[len(xapka)-1,"date"]) +"] total =1000.0 after count: ["+str(count)+"] times total profit = "+str(round(total,3)) )
+    
+
+    mtime = os.path.getmtime('D:\Stock_bk\Trade.py') #修改时间
+    mtime_string = datetime.fromtimestamp(int(mtime))
+    b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
+    TredProfit = pd.concat([TredProfit, pd.DataFrame([b])], ignore_index=True)
+    if len(TredProfit) >0:
+        TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit", "CreatDate"]
+    #TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
+    if len(TredRoc) > 0:
+        TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
+    ##############################################################################################
     CurrDateTime = datetime.now()
-    StrDate = CurrDateTime.strftime("%Y-%m-%d")
-    StrTime = datetime.now().strftime("_%Y-%m-%d_%H_%M_%S")
-    Bef1YerDate = CurrDateTime  - timedelta(days=365)
-    Bef3Date = CurrDateTime  - timedelta(days=3)
-    Str3Date = Bef3Date.strftime("%Y-%m-%d")
-    print('實驗日期-時間 : ' , CurrDateTime)
-except Exception as errMsg:                   # 如果 try 的內容發生錯誤，就執行 except 裡的內容
-    print('連線SQL發生錯誤-' , errMsg)
+    if CurrDateTime.day == 1 or CurrDateTime.day == 15:
+        try:
+            if len(TredProfit) >0:
+                TredProfit.to_sql( 'TrateProf1',db.eng_trade,if_exists='append', index=False)
+            if len(TredRoc) > 0:
+                TredRoc.to_sql( 'TrateRec_'+Ticker,db.eng_trade,if_exists='append', index=False)        
+            #print(SingTredRoc)
+        except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
+            print('回存Trade資料庫錯誤_', Ticker , errMsg) 
 
-TotTredRoc = pd.DataFrame()
-cnt =0
-sql_cmd = cmd.s_Stock_Ticker
-Country = 'US'
-if len(sys.argv) >=2:
-    if sys.argv[1] == 'TW':
-        sql_cmd = cmd.s_Stock_Ticker_TW
-        Country = 'TW'
-cmd.DelDupDay_Combin(Country)        
-Ticker = pd.read_sql(sql_cmd, db.eng_Stock)
-for i in Ticker.Stock:
-#for i in stk_list:
-    xcode = i.strip()    
-    print('apka_每日分析_'+xcode)
-    try:
-        SqlMaxDate = ClearApkaDay(xcode)
-    except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
-        SqlMaxDate = Bef1YerDate.strftime("%Y-%m-%d")
-    #==========================================
-    sql3 = cmd.sqlCommand( xcode ,6, Bef1YerDate)
-    #==========================================
-    data = pd.read_sql(sql3, db.eng_analsy, parse_dates=True)
-    data.columns = ["date","open","high","low","close","colume",\
-                    "fastk_d","fastd_d","fastk_w","fastd_w","fastk_m","fastd_m",\
-                    "willrd","willrw","willrm",\
-                    "MACD_d","signal_d","histg_d","MACD_w","signal_w","histg_w","MACD_m","signal_m","histg_m",\
-                    "upp_d","mid_d","low_d","upp_w","mid_w","low_w","upp_m","mid_m","low_m",\
-                    "ema1","ema2","ema3","ema4","ema5","ema6","ema7","ema8","ema9","ema10",\
-                    "vap1","vap2","vap3","emavol1","emavol2","emavol3","vol2pri","volume"] 
-    data.replace("Zero", 0)
-    #data.set_index("date" , inplace=True)
-    #print('Ticker='+xcode)
-    #apka_count_EMA.score_EMA(data)
-    apkaTre = apka_score_trend.score_trend(data)
-    apkaTre =apkaTre.drop(columns=["buy", "sell", "profit"])
-    apkaOsc = apka_score_oscillate.score_oscillate(data)
-    apkEma = apka_count_EMA.score_EMA(data)
+    if rzt == 1:
+        return xapka
+    else:
+        return TredRoc
+    #TredRoc.to_csv('TredRocord_'+Ticker+'.csv')     
     
-    #apkaOsc =apkaOsc.drop(columns=["close","sum","buy", "sell", "profit"])
-    #apkaOsc.set_index('date')
-    apkaCom = pd.merge( apkaTre, apkaOsc)
-    apkaCom = pd.merge( apkaCom, apkEma)
-    #["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","sum", "xploy"]
-    apkaCom["OscSum"] = apkaCom["xsrsi"]+apkaCom["xwillrd"]+apkaCom["xBBand"]
-    #xapka.columns = ["date", "close", "xema", "xmacd", "xsrsi", "xwillrd", "xBBand","sum", "xploy"]
-    #print(apkaCom.head())
-    #print(apkaCom.tail(5))
-    
-    #print(cmb.head())
-    cmb = analsy_score_xcom.score_xcom(apkaCom)
-    apkaCom = pd.merge( apkaCom, cmb)    
-    
-    apkaefi =apka_score_volume.score_pulse(data)
-    apkaCom = pd.merge( apkaCom, apkaefi)
-    apkan9 =apka_score_volume.score_nime(data)
-    apkaCom = pd.merge( apkaCom, apkan9)    
-    #apka_score_ploy.plot_vol(apkaCom, xcode,CurrDateTime)
-    
-    SingTredRoc = Trade.TotProfit(apkaCom, xcode, CurrDateTime,1)
-    SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+SqlMaxDate+" 00:00:00.000'"]
-    try:
-        SingTredRoc.reset_index(drop=True)      
-        SingTredRoc.to_sql( 'ApkaDay_'+xcode,db.eng_apka,if_exists='append', index=False)
-        cnt = cnt+1
-        SingTredRoc = SingTredRoc[SingTredRoc["date"]>= "'"+Str3Date+" 00:00:00.000'"]
-        SingTredRoc.loc[SingTredRoc.close>0, "xremark"] = str(cnt).zfill(2)+'_'+ xcode
-        df = SingTredRoc[['date','xremark']]
-        df = df.rename(columns={'xremark': 'typ'})
-        SingTredRoc = pd.merge( SingTredRoc, df)
-        SingTredRoc.loc[SingTredRoc.close>0, "typ"] = Ticker.iat[cnt-1,0]  
-        SingTredRoc.to_sql( 'ApkaDay_Combin_'+Country,db.eng_apka,if_exists='append', index=False)
-        #print(SingTredRoc)
-    except Exception as errMsg:# 如果 try 的內容發生錯誤，就執行 except 裡的內容
-        print('回存apka資料庫錯誤_', xcode , errMsg)   
-    
-    
-
-    
-
-    #apkaCom.to_csv("apkaCom.csv")
-    
-    #TotTredRoc = pd.concat([TotTredRoc, SingTredRoc], ignore_index=True)
-    #TotTredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit"]
-    #t = datetime.now()
-    #StrTime = t.strftime("_%Y-%m-%d_%H_%M_%S")
-    #trad_record.DoSummsry(TotTredRoc, CurrDateTime)
-    #TotTredRoc.to_sql('TradeRecord1',engine3,if_exists='append', index=False)
-    #apka_score_ploy.plot(apkaCom, xcode,CurrDateTime)
-    #trad_record.DoSummsry()
+#---------------------------------------------------------------------------
+    def BbToBuy(i):
+        if prebuy ==0:
+            if   xBBand ==2:
+                return 1
+            #elif xBBand ==-2:
+            #    return -1               
+        else:
+            return 0
+        
+    def BbToSell(i):
+        if   xBBand  <0 and prebuy == 1:
+            return 1
+        elif xBBand  >0 and prebuy == -1:
+            return -1
+        else:
+            return 0
+#---------------------------------------------------------------------------
+    def MacdToBuy(i):
+        if prebuy ==0:
+            if   xmacd > xmacd_1 and xmacd_1== -1 :
+                return 1
+            #elif xBBand ==-2:
+            #    return -1               
+        else:
+            return 0
+        
+    def MacdToSell(i):
+        
+        if   xmacd < xmacd_1 and xmacd_1== 2 and prebuy == 1:
+            return 1
+        #elif xmacd < xmacd_1 and xmacd_1== 2:
+        #    return -1
+        else:
+            return 0
