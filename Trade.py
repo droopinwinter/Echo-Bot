@@ -182,7 +182,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
         TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
     ##############################################################################################
     CurrDateTime = datetime.now()
-    if (CurrDateTime.day >= 1 and CurrDateTime.day <= 3) or (CurrDateTime.day >= 15 and CurrDateTime.day <= 17):
+    if (CurrDateTime.day >= 27 and CurrDateTime.day <= 30) or (CurrDateTime.day >= 12 and CurrDateTime.day <= 14):
         try:
             if len(TredProfit) >0:
                 TredProfit.to_sql( 'TrateProf1',db.eng_trade,if_exists='append', index=False)
