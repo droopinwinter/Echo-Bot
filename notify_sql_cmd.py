@@ -19,7 +19,7 @@ def Sig2BuySell( befDate, countyr):
         mark    = "substring([xremark],4,5)"  
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"  
     #return f"SELECT distinct [date],left(TYP,3) TYP,[buySig] buy,[SellSig] Sell,[OscSum] Osc,[xmacd] MACD ,{mark} STK"+\
-    return f"SELECT distinct [date],left(TYP,3) TYP,[buySig] buy,[SellSig] Sell,[xmacd] MACD ,{mark} STK"+\
+    return f"SELECT distinct [date],left(TYP,3) TYP,[buySig] buy,[SellSig] Sell,[xmacd]+ case when [plse]>0 then 10 when [plse]<0 then -10 else 0 end MACD ,{mark} STK"+\
     f" FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] "+\
     f" where date {dateR} AND ( buySig <>0 or SellSig <> 0) {IfTw} order by date,typ "
 
@@ -34,7 +34,7 @@ def Sig2LowBull( befDate, countyr):
         IfTw = "and right([xremark], 3) <> '.TW'"      
         mark    = "substring([xremark],4,5)"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"  
-    return f"SELECT distinct [date],left(TYP,3) TYP,[BBlevel] BB,[OscSum] Osc,[TrnSlop] slp ,{mark} STK "+\
+    return f"SELECT distinct [date],left(TYP,3) TYP,[BBlevel] BB,[OscSum] Osc, [count9] c9,{mark} STK "+\
        f" FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] "+\
        f" where date {dateR} AND ([BBlevel]<0.2 ) and [OscSum] >=3 {IfTw} order by date,typ "
 
@@ -49,7 +49,7 @@ def Sig2HighBull( befDate, countyr):
         IfTw = "and right([xremark], 3) <> '.TW'"  
         mark    = "substring([xremark],4,5)"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return f"SELECT distinct [date],left(TYP,3) TYP,[BBlevel] BB,[OscSum] Osc ,{mark} STK "+\
+    return f"SELECT distinct [date],left(TYP,3) TYP,[BBlevel] BB,[OscSum] Osc ,[count9] c9,{mark} STK "+\
        f" FROM [apka].[dbo].[ApkaDay_Combin_{countyr}]  "+\
        f" where date {dateR} AND (([BBlevel]>0.9 and [OscSum] <=-3) or ([BBlevel]<0.1 and [OscSum] >=3))  {IfTw} order by date,typ"
 #=================================================
@@ -86,8 +86,8 @@ def Sig2TrendAndOsc_part1( befDate, countyr):
         range   = "'01' and '80'"
         range   = "'01' and '22'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] OSC,[xmacd] MCD,[buy] St,[mark] STK FROM ( "+\
-      "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
+    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] OSC,[xmacd]+ case when [plse]>0 then 10 when [plse]<0 then -10 else 0 end MCD,[buy] St,[mark] STK FROM ( "+\
+      "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[plse],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date {dateR} {IfTw} "+\
       f"  and typ in ('etf','index','main') ) a order by typ,pre "
@@ -105,8 +105,8 @@ def Sig2TrendAndOsc_part2( befDate, countyr):
         mark    = "substring([xremark],4,5)"
         range   = "'23' and '44'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] Osc,[xmacd] MCD,[buy] St,[mark] STK FROM ( "+\
-      "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
+    return "SELECT [date],TYP,[BBlevel] BB,[OscSum] Osc,[xmacd]+ case when [plse]>0 then 10 when [plse]<0 then -10 else 0 end MCD,[buy] St,[mark] STK FROM ( "+\
+      "  SELECT distinct [date],left(TYP,3) TYP,[xema],[xmacd],[plse],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR} {IfTw} "+\
       f"  and typ in ('stock')  ) a order by typ,pre "
@@ -124,8 +124,8 @@ def Sig2TrendAndOsc_part3( befDate, countyr):
         mark    = "substring([xremark],4,5)"  
         range   = "'22' and '40'"
         dateR   = f"between GETDATE()-{befDate} and  GETDATE()-1"
-    return "SELECT [date],TYP,[buy] Sta,[BBlevel] BB,[OscSum] OSC,[xmacd] MCD,[mark] STK FROM ( "+\
-      "  SELECT distinct [date],TYP,[xema],[xmacd],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
+    return "SELECT [date],TYP,[buy] Sta,[BBlevel] BB,[OscSum] OSC,[xmacd]+ case when [plse]>0 then 10 when [plse]<0 then -10 else 0 end MCD,[mark] STK FROM ( "+\
+      "  SELECT distinct [date],TYP,[xema],[xmacd],[plse],[TrnSlop],[buySig],[SellSig],[buy],[OscSum] "+\
       f"  ,[BBlevel], substring([xremark],1,2) pre, {mark} mark "+\
       f"  FROM [apka].[dbo].[ApkaDay_Combin_{countyr}] where date  {dateR}  {IfTw} "+\
       f" and left([xremark], 2) between {range} ) a order by typ,pre "

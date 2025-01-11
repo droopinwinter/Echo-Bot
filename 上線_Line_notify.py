@@ -98,7 +98,7 @@ if len(sys.argv) >=2:
 cmd.DelDupDay(country)
 stitle = " 類  布林 擺盪 多空 持倉 \n"+ " 別  帶限 極限 趨勢 狀態  品種\n"
 sBuyTitle = "                            多空\n"+"類別 進出場信號  趨勢   品種\n"
-sLimiTitle = "類別 布林 擺盪 \n"+"        帶限 極限 品種\n"
+sLimiTitle = "類別 布林 擺盪 九轉\n"+"        帶限 極限       品種\n"
 
 '''
 "類別 布林 擺盪 多空 持倉 \n"+
