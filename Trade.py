@@ -162,21 +162,34 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
             xapka.at[i,"buy"]  = xapka.at[i-1,"buy"]
 
     EndDate = len(xapka)
-    init = total =100.0
+    init = total = stot= ltot=100.0
     count = 0
+    lcnt =0
+    scnt =0
     for i in range(1,EndDate):
         if xapka.at[i,"profit"] != 0:
-            count = count +1
+            if xapka.at[i-1,"buy"] >0:
+                lcnt +=1     
+                ltot =ltot +ltot*xapka.at[i,"profit"]
+            else:
+                scnt +=1
+                stot =stot +stot*xapka.at[i,"profit"]
+            count = count+1        
             total = total + total*xapka.at[i,"profit"]
-    print( Ticker, "From [" + str(xapka.at[1,"date"]) +"] to ["+ str(xapka.at[len(xapka)-1,"date"]) +"] total =1000.0 after count: ["+str(count)+"] times total profit = "+str(round(total,3)) )
+    print( Ticker, "[" + str(xapka.at[1,"date"]) +"]~["+ str(xapka.at[len(xapka)-1,"date"])\
+                +"] totcnt: ["+str(count)+"] profit = "+str(round(total,3))\
+                +'LongCnt:'+str(lcnt)+'  Lprofit'+ str(round(ltot,3)) +'  ShortCnt:'+str(scnt)+'  Sprofit'+ str(round(stot,3)))
     
 
     mtime = os.path.getmtime('D:\\Stock_bk\\Trade.py') #修改时间
     mtime_string = datetime.fromtimestamp(int(mtime))
-    b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
+    #b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], init, count, round(total,3),CurrDateTime]
+    b = [Ticker, mtime_string, xapka.at[1,"date"], xapka.at[len(xapka)-1,"date"], \
+         init, count,round(total,3),lcnt,round(ltot,3),scnt,round(stot,3),CurrDateTime]
     TredProfit = pd.concat([TredProfit, pd.DataFrame([b])], ignore_index=True)
     if len(TredProfit) >0:
-        TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit", "CreatDate"]
+        #TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit", "CreatDate"]
+        TredProfit.columns = ["Ticker","VersionDate","StartDate","EndDate","InitPrice","TradeCount","profit","LongCount","LongProfit","ShortCount","ShortProfit", "CreatDate"]
     #TredRoc = pd.concat([TredRoc, pd.DataFrame([a])], ignore_index=True)
     if len(TredRoc) > 0:
         TredRoc.columns = ["Ticker","LongShort","Buydate","Selldate","buyPrice","SellPrice","profit", "CreatDate"]
@@ -185,7 +198,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
     if (CurrDateTime.day >= 27 and CurrDateTime.day <= 30) or (CurrDateTime.day >= 12 and CurrDateTime.day <= 14):
         try:
             if len(TredProfit) >0:
-                TredProfit.to_sql( 'TrateProf1',db.eng_trade,if_exists='append', index=False)
+                TredProfit.to_sql( 'TrateProf2',db.eng_trade,if_exists='append', index=False)
             if len(TredRoc) > 0:
                 TredRoc.to_sql( 'TrateRec_'+Ticker,db.eng_trade,if_exists='append', index=False)        
             #print(SingTredRoc)
