@@ -25,8 +25,10 @@ def lineNotify(msg):
     time.sleep(1)
 
 def read_sql1(SqlStr, engine):
-   sProfTitle = '          交易\n'+\
-                '品種    次數  利潤 多次  多利 空次  空利\n'#'品種 交易次數 利潤\n'
+#          做多 做多 做空 做空
+#次數  利潤 次數 利潤 次數 利潤    品種
+   sProfTitle = '                 做多 做多 做空 做空\n'+\
+                '次數  利潤 次數 利潤 次數 利潤    品種\n'#'品種 交易次數 利潤\n'
    df = pd.read_sql(SqlStr, engine)
    if len(df) == 0 :
       return ''
@@ -35,6 +37,9 @@ def read_sql1(SqlStr, engine):
       Edate = df.at[10,"EndDate"]
       df =df.drop(columns=["StartDate","EndDate"])
       df = cv.USdf2Chtext(df)
+      for col in df.columns:
+         df[col] = df[col].astype(str)
+         df[col] = df[col].str.rjust(4)
       df["STK"] = df["STK"].str.ljust(min(len(df["profit"]), 10))
       #df["profit"] = df["profit"].str.pad( min(len(df["profit"]), 6), side='right')
       #df[""] = df[""].str.zfill(6)  
@@ -123,6 +128,7 @@ try:
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("\n日期 : "+ sToday+"\n其他＿共22個\n"+stitle+ msg5)
+      
       if xToday.day == 1 or xToday.day == 16 :
          msg5 = read_sql1(cmd.TradeProfit1M( 3,country), db.eng_trade)
          if msg5 !='':
@@ -136,7 +142,7 @@ try:
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part2(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("\n日期 : "+ sToday+"\n大科技&其他\n"+stitle+ msg5)  
-      '''
+      '''      
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("_大科技＿共11個\n"+msg5)   
