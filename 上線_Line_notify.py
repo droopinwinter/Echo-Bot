@@ -26,7 +26,7 @@ def lineNotify(msg):
 
 def read_sql1(SqlStr, engine):
    sProfTitle = '          交易\n'+\
-                '品種    次數  利潤\n'#'品種 交易次數 利潤\n'
+                '品種    次數  利潤 多次  多利 空次  空利\n'#'品種 交易次數 利潤\n'
    df = pd.read_sql(SqlStr, engine)
    if len(df) == 0 :
       return ''
@@ -123,7 +123,7 @@ try:
       msg5 = read_sql(cmd.Sig2TrendAndOsc_part3(befDay,country), db.eng_apka)
       if msg5 !='':
          lineNotify("\n日期 : "+ sToday+"\n其他＿共22個\n"+stitle+ msg5)
-      if xToday.day == 1 or xToday.day == 15 :
+      if xToday.day == 1 or xToday.day == 16 :
          msg5 = read_sql1(cmd.TradeProfit1M( 3,country), db.eng_trade)
          if msg5 !='':
             lineNotify("\n日期 : "+ sToday+"\n一年內交易績效排序\n"+ msg5)
@@ -141,7 +141,7 @@ try:
       if msg5 !='':
          lineNotify("_大科技＿共11個\n"+msg5)   
       '''
-      if xToday.day == 1 or xToday.day == 15 :
+      if xToday.day == 1 or xToday.day == 16 :
          msg5 = read_sql1(cmd.TradeProfit1M( 3,country), db.eng_trade)
          if msg5 !='':
             lineNotify("\n日期 : "+ sToday+"\n一年內交易績效排序\n"+ msg5)      

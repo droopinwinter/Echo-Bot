@@ -137,5 +137,8 @@ def TradeProfit1M( xDate,country):
         IfTw = "and right([Ticker], 3) = '.TW'"
     else:
         IfTw = "and right([Ticker], 3) <> '.TW'"
-    return "SELECT distinct [Ticker] STK,[StartDate] ,[EndDate] ,[TradeCount] ,[profit] "+\
-          f"FROM [trade].[dbo].[TrateProf] WHERE [CreatDate] > GETDATE()-{xDate} {IfTw} order by [profit] desc"
+    #return "SELECT distinct [Ticker] STK, [StartDate] ,[EndDate] ,[TradeCount] ,[profit],[LongCount],[LongProfit],[ShortCount],[ShortProfit] "+\
+    #      f"FROM [trade].[dbo].[TrateProf2] WHERE [CreatDate] > GETDATE()-{xDate} {IfTw} order by [profit] desc"
+    return "SELECT * FROM ( SELECT [Ticker] STK,[StartDate],[EndDate],[TradeCount],[profit],[LongCount]"+\
+        ",[LongProfit],[ShortCount],[ShortProfit],ROW_NUMBER() OVER (PARTITION BY [Ticker] ORDER BY [CreatDate] DESC) sn"+\
+        f"	FROM [trade].[dbo].[TrateProf2] WHERE [CreatDate] > GETDATE()-{xDate} {IfTw} ) R WHERE R.sn =1 order by profit"
