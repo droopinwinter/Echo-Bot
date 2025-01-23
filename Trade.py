@@ -133,17 +133,20 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
 
         if toBuy >= 1 :
             xapka.at[i,"buy"] =toBuy
+            xapka.at[i,"HoldPrice"] = xapka.at[i,"close"]
             buyPrice = xapka.at[i,"close"]
             Buydate  = xapka.at[i, "date"]
             BuySellway = BuySellway +'+Buy_'+str(xapka.at[i, "date"])[5:10]+' => ' 
         elif toBuy <= -1 :
             xapka.at[i,"buy"] =toBuy
+            xapka.at[i,"HoldPrice"] = xapka.at[i,"close"]
             buyPrice = xapka.at[i,"close"]
             Buydate  = xapka.at[i, "date"]
             BuySellway = BuySellway +'-Buy_'+str(xapka.at[i, "date"])[5:10]+' => '             
         elif toSell >= 1 :
             #xapka.at[i,"Sell"] =1
             xapka.at[i,"buy"] =0
+            xapka.at[i,"HoldPrice"] = 0
             xapka.at[i,"profit"] = (xapka.at[i,"close"] - buyPrice)/buyPrice
             #print(BuySellway +'Sell_'+str(xapka.at[i, "date"])[5:10]+'_profit= '+str( xapka.at[i,"profit"].round(3)))
             a = [Ticker, xapka.at[i-1,"buy"], Buydate, xapka.at[i, "date"], round(buyPrice, 3), round(xapka.at[i,"close"], 3), round(xapka.at[i,"profit"],3), CurrDateTime]
@@ -152,6 +155,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
         elif toSell <= -1 :
             #xapka.at[i,"Sell"] =-1
             xapka.at[i,"buy"] =0
+            xapka.at[i,"HoldPrice"] = 0
             xapka.at[i,"profit"] = (buyPrice - xapka.at[i,"close"])/buyPrice
             #print(BuySellway +'Sell_'+str(xapka.at[i, "date"])[5:10]+'_profit= '+str( xapka.at[i,"profit"].round(3)))
             a = [Ticker, xapka.at[i-1,"buy"], Buydate, xapka.at[i, "date"], round(buyPrice, 3), round(xapka.at[i,"close"], 3), round(xapka.at[i,"profit"], 3), CurrDateTime]
@@ -160,6 +164,7 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
         else:
             #xapka.at[i,"Sell"] = xapka.at[i-1,"Sell"]
             xapka.at[i,"buy"]  = xapka.at[i-1,"buy"]
+            xapka.at[i,"HoldPrice"] = xapka.at[i-1,"HoldPrice"]
 
     EndDate = len(xapka)
     init = total = stot= ltot=100.0
@@ -174,11 +179,11 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
             else:
                 scnt +=1
                 stot =stot +stot*xapka.at[i,"profit"]
-            count = count+1        
+            count = count+1
             total = total + total*xapka.at[i,"profit"]
     print( Ticker, "[" + str(xapka.at[1,"date"]) +"]~["+ str(xapka.at[len(xapka)-1,"date"])\
-                +"] totcnt: ["+str(count)+"] profit = "+str(round(total,3))\
-                +'LongCnt:'+str(lcnt)+'  Lprofit'+ str(round(ltot,3)) +'  ShortCnt:'+str(scnt)+'  Sprofit'+ str(round(stot,3)))
+                +"] Tcnt: ["+str(count)+"] Profit = "+str(round(total,3))\
+                +'  LCnt:'+str(lcnt)+'  Lprofit='+ str(round(ltot,3)) +'  SCnt:'+str(scnt)+'  Sprofit='+ str(round(stot,3)))
     
 
     mtime = os.path.getmtime('D:\\Stock_bk\\Trade.py') #修改时间

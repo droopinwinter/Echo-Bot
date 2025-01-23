@@ -82,7 +82,7 @@ for i in Ticker.Stock:
     #print('Ticker='+xcode)
     #apka_count_EMA.score_EMA(data)
     apkaTre = apka_score_trend.score_trend(data)
-    apkaTre =apkaTre.drop(columns=["buy", "sell", "profit"])
+    apkaTre =apkaTre.drop(columns=[ "sell", "profit"])
     apkaOsc = apka_score_oscillate.score_oscillate(data)
     apkEma = apka_count_EMA.score_EMA(data)
     
