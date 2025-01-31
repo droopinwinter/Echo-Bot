@@ -78,25 +78,34 @@ def TotProfit(xapka, Ticker, CurrDateTime, rzt,country):
         
         Prebuy = xapka.at[i-1,"buy"]
         if country == 'US':
-            if   Prebuy == 10 and ( (xmacd == 4 or (OscSum<=-1 and xmacd <0)) or (xplse<0 and xplse_1>=0) or (cnt9>=9))  :
-                xapka.at[i,"SellSig"] =110  
-                return Prebuy #+極端交易    
-            elif Prebuy < 0 and Prebuy > -10 and ( yema > yema_1 or xmacd > xmacd_1):
-                xapka.at[i,"SellSig"] =Prebuy-100
-                return Prebuy #-GMMA交易
-            elif Prebuy > 0   and Prebuy < 10 and(yema < yema_1 or xmacd < xmacd_1 ): #and Prebuy == yema_1
-                xapka.at[i,"SellSig"] =Prebuy+100
-                return Prebuy #+GMMA交易
-            elif Prebuy ==20  and (OscSum <=-6 or (xmacd < xmacd_1 ) \
-                                or (xema < xema_1 ) or ( xplse<0 ) or (xplse<0 and xplse_1>=0) or (cnt9>=9)) :     
-                xapka.at[i,"SellSig"] =Prebuy+100
-                return Prebuy #+趨勢交易
-            elif Prebuy ==-20  and ( OscSum >=3 or (xmacd > xmacd_1 and  xmacd<=0 ) 
-                                    or (xema > xema_1 and  xema <=0) or (xplse>0 and xplse_1<=0) or (cnt9>=9) )  :     
-                xapka.at[i,"SellSig"] =Prebuy-100
-                return Prebuy        
-            else:
+            if Prebuy == 0:
                 return 0
+            elif Prebuy > 0 and xapka.at[i,"HoldPrice"]*0.95 <= xapka.at[i,"close"] :
+                xapka.at[i,"SellSig"] =Prebuy+200
+                return Prebuy #+極端交易    
+            elif Prebuy < 0 and xapka.at[i,"HoldPrice"]*1.05 <= xapka.at[i,"close"] :
+                xapka.at[i,"SellSig"] =Prebuy-200
+                return Prebuy #+極端交易    
+            else:
+                if   Prebuy == 10 and ( (xmacd == 4 or (OscSum<=-1 and xmacd <0)) or (xplse<0 and xplse_1>=0) or (cnt9>=9))  :
+                    xapka.at[i,"SellSig"] =110  
+                    return Prebuy #+極端交易    
+                elif Prebuy < 0 and Prebuy > -10 and ( yema > yema_1 or xmacd > xmacd_1):
+                    xapka.at[i,"SellSig"] =Prebuy-100
+                    return Prebuy #-GMMA交易
+                elif Prebuy > 0   and Prebuy < 10 and(yema < yema_1 or xmacd < xmacd_1 ): #and Prebuy == yema_1
+                    xapka.at[i,"SellSig"] =Prebuy+100
+                    return Prebuy #+GMMA交易
+                elif Prebuy ==20  and (OscSum <=-6 or (xmacd < xmacd_1 ) \
+                                    or (xema < xema_1 ) or ( xplse<0 ) or (xplse<0 and xplse_1>=0) or (cnt9>=9)) :     
+                    xapka.at[i,"SellSig"] =Prebuy+100
+                    return Prebuy #+趨勢交易
+                elif Prebuy ==-20  and ( OscSum >=3 or (xmacd > xmacd_1 and  xmacd<=0 ) 
+                                        or (xema > xema_1 and  xema <=0) or (xplse>0 and xplse_1<=0) or (cnt9>=9) )  :     
+                    xapka.at[i,"SellSig"] =Prebuy-100
+                    return Prebuy        
+                else:
+                    return 0
         else:
             if   Prebuy == 10 and (xmacd == 4 or (OscSum<=-1 and xmacd <0) )  :
                 xapka.at[i,"SellSig"] =110  
