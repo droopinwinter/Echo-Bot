@@ -249,8 +249,8 @@ def handle_postback(event):
             xmsg = Bll.GetProfit('TW')
         elif postback_data[:3] == 'pic':
             xStack = postback_data[3:]
-            if  os.path.isfile('./static/'+xStack+'.png'):
-                url = request.url_root + 'static/'+xStack+'.png' #'chart/logo.jpg'
+            if  os.path.isfile(xStack+'.jpg'):
+                url = request.url_root +xStack+'.jpg' #'chart/logo.jpg'
                 url = url.replace("http", "https")
                 app.logger.info("url=" + url)
                 line_bot_api.reply_message(
