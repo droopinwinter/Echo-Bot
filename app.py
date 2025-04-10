@@ -27,7 +27,7 @@ from linebot.v3.webhooks import (
     FollowEvent,
     PostbackEvent
 )
-import GetSqlMsg as Bll
+import GetTxtMsg as Bll
 from datetime import datetime
 from datetime import timedelta
 import os
@@ -43,6 +43,12 @@ stk_list = [
 ,'TSLA' ,'APPLE','NVDA','MSFT','AMZN','NFLX','META','AMD','GOOGL','MU'
 ,'FNGU','SOXL','XBI','XLE','CL','XLF','XME','XLV','XLP','IYR','XLU','XLI'
 ]
+##########################################################################
+def ReadText(UseWay, Country):
+    #path ="D:\\AI-Line-Bot\\static\\"+ UseWay+"_"+Country+ ".txt"
+    path = UseWay+"_"+Country+ ".txt"
+    f = open(path, 'r')
+    return f.read()
 
 @app.route("/callback", methods=['POST'])
 def callback():
