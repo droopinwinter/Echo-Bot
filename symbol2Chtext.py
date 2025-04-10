@@ -1,5 +1,5 @@
 #symbol2Chtext
-import pandas as pd
+
 
 def TWsymbol2Chtext(xSymbol):
   match xSymbol:

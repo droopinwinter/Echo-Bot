@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import timedelta
-import pandas as pd
 import time
 import symbol2Chtext as cv
 manual = "\n技術分析-日K+週K-綜合訊號說明如下\n"+\
