@@ -12,7 +12,7 @@ manual = "\n技術分析-日K+週K-綜合訊號說明如下\n"+\
 def ReadText(UseWay, Country):
     #path ="D:\\AI-Line-Bot\\static\\"+ UseWay+"_"+Country+ ".txt"
     path = UseWay+"_"+Country+ ".txt"
-    f = open(path, 'rb')
+    f = open(path, 'r')
     return f.read()
 ##########################################################################
 ##########################################################################
