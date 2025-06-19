@@ -25,10 +25,10 @@ def NotifySign(ybefDay,yStrDate,ycountry):
     sLimiTitle = "類別 布林 擺盪 神奇\n"+"        帶限 極限 九轉    品種\n"
     msg1 = ReadText("Trade", ycountry)
     if msg1 !='':
-        msg1 = "\n日期 : "+ yStrDate +"\n買賣徵兆\n"+ sBuyTitle+ msg1
+        msg1 = msg1
     msg3 =  ReadText("Warn", ycountry)
     if msg3 !='':
-        msg3 = "\n可能有極端反轉訊號\n"+sLimiTitle+ msg3 
+        msg3 = msg3 
     return msg1 + msg3
 ##########################################################################
 def GetEvaluate_TW(befDay,StrDate):
