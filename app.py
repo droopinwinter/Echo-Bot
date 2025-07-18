@@ -219,7 +219,9 @@ def handle_message(event):
                     QuickReplyItem(action=PostbackAction(label="美股評估",  data="EvaluUS", display_text="今日美股評估"),),
                     QuickReplyItem(action=PostbackAction(label="台股評估",  data="EvaluTW", display_text="今日台股評估"),),
                     QuickReplyItem(action=PostbackAction(label="月美股績效",data="ProfitUS",display_text="月美股績效排序"),),
-                    QuickReplyItem(action=PostbackAction(label="月台股績效",data="ProfitTW",display_text="月台股績效排序"),)
+                    QuickReplyItem(action=PostbackAction(label="月台股績效",data="ProfitTW",display_text="月台股績效排序"),),
+                    QuickReplyItem(action=PostbackAction(label="年台股勝率",data="WinRateTW",display_text="年台股交易勝率"),),
+                    QuickReplyItem(action=PostbackAction(label="年美股勝率",data="WinRateUS",display_text="年美股交易勝率"),)
                 ]
             )
             
@@ -253,6 +255,10 @@ def handle_postback(event):
             xmsg = Bll.GetProfit('US')
         elif postback_data == 'ProfitTW':
             xmsg = Bll.GetProfit('TW')
+        elif postback_data == 'WinRateTW':
+            xmsg = Bll.ReadText('WinRate','TW')
+        elif postback_data == 'WinRateUS':
+            xmsg = Bll.ReadText('WinRate','US')
         elif postback_data[:3] == 'pic':
             xStack = postback_data[3:]
             if  os.path.isfile('./static/'+xStack+'.jpg'):
